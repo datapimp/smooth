@@ -8,9 +8,6 @@ module Smooth
       @default ||= Smooth::Api.new
     end
 
-    def self.reset!
-    end
-
     attr_accessor :name,
                   :_version_config,
                   :_resources,
@@ -66,8 +63,8 @@ module Smooth
 
         _resources[resource_name.to_sym] = created
       end
-
     end
+
   end
 end
 

@@ -1,6 +1,34 @@
 require 'smooth/ext/mutations'
+require 'smooth/command/instrumented'
 
 class Smooth::Command < Mutations::Command
+  include Instrumented
+
+  class_attribute :resource_name,
+                  :command_action,
+                  :event_namespace
+
+  def self.filter_explanations
+    input_filters.filter_explanations
+  end
+
+  def self.scope setting
+    @@scope = setting
+  end
+
+  def self.params *args, &block
+    send(:required, *args, &block)
+  end
+
+  def event_namespace; self.class.event_namespace; end
+
+  def self.event_namespace
+    @event_namespace || "#{ command_action }.#{ resource_name.singularize.underscore }".downcase
+  end
+
+  # DSL Hooks
+  #
+  #
   def self.configure options, resource=nil
     resource ||= Smooth.current_resource
     klass = define_or_open(options, resource)
@@ -23,18 +51,9 @@ class Smooth::Command < Mutations::Command
       return command_klass
     end
 
-    Object.const_set(klass, Class.new(base))
-  end
-
-  def self.filter_explanations
-    input_filters.filter_explanations
-  end
-
-  def self.scope setting
-    @@scope = setting
-  end
-
-  def self.params *args, &block
-    send(:required, *args, &block)
+    Object.const_set(klass, Class.new(base)).tap do |k|
+      k.resource_name = resource.name.to_s
+      k.command_action  = options.name.to_s
+    end
   end
 end

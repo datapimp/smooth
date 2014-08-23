@@ -3,8 +3,9 @@ $:.unshift File.dirname(__FILE__)
 begin
   require 'hashie'
   require 'active_support/core_ext'
-  require 'mutations'
+  require 'active_support/notifications'
   require 'active_model_serializers'
+  require 'mutations'
   require 'pry'
 rescue LoadError
   require 'rubygems'
@@ -15,6 +16,7 @@ end
 
 
 require "smooth/documentation"
+require "smooth/event"
 
 require "smooth/api"
 require "smooth/cache"
@@ -30,6 +32,7 @@ require "smooth/version"
 module Smooth
   extend Smooth::Api::Tracking
   extend Smooth::Resource::Tracking
+  extend Smooth::Event::Adapter
 
   def self.command
     config.command_class
@@ -58,4 +61,3 @@ module Smooth
 
   end if defined?(::Rails)
 end
-
