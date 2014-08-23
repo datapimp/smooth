@@ -3,7 +3,7 @@ module Smooth
     module Instrumented
       def self.included(base)
         base.extend(ClassMethods)
-        base.enable_event_tracking!
+        base.enable_event_tracking! # if Smooth.config.enable_event_tracking_by_default?
       end
 
       module Overrides
