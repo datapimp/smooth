@@ -2,6 +2,8 @@ module Smooth
   module Documentation
 
     def self.included base
+      binding.pry
+
       base.class_eval do
         attr_accessor :_inline_description
 

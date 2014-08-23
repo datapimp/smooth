@@ -8,10 +8,6 @@ class Smooth::Command < Mutations::Command
                   :command_action,
                   :event_namespace
 
-  def self.filter_explanations
-    input_filters.filter_explanations
-  end
-
   def self.scope setting
     @@scope = setting
   end
@@ -20,11 +16,11 @@ class Smooth::Command < Mutations::Command
     send(:required, *args, &block)
   end
 
-  def event_namespace; self.class.event_namespace; end
-
   def self.event_namespace
     @event_namespace || "#{ command_action }.#{ resource_name.singularize.underscore }".downcase
   end
+
+  def event_namespace; self.class.event_namespace; end
 
   # DSL Hooks
   #

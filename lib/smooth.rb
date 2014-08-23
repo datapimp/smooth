@@ -15,6 +15,7 @@ rescue LoadError
 end
 
 
+require "smooth/ext/core"
 require "smooth/documentation"
 require "smooth/event"
 
