@@ -18,4 +18,8 @@ tmp
 log/*.log
 spec/dummy/log/*.log
 spec/dummy/tmp/**/*
+spec/dummy/db/*.sqlite3
+*.sqlite3
 .vimrc
+
+
