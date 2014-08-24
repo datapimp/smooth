@@ -51,6 +51,10 @@ module Smooth
     Smooth::Configuration.instance
   end
 
+  def self.events
+    Smooth::Event::Proxy
+  end
+
   class Engine < ::Rails::Engine
     initializer 'smooth.load_resources', :before => :build_middleware_stack do |app|
       app_root = app.config.root.join("app")

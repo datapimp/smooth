@@ -1,3 +1,6 @@
+require "smooth/event/relay"
+require "smooth/event/proxy"
+
 module Smooth
   class Event < ActiveSupport::Notifications::Event
 
@@ -15,9 +18,11 @@ module Smooth
         Smooth::Event.provider.send(:instrument, *args)
       end
 
-      def subscribe_to event_name, &block
+      def subscribe_to event_name, aggregator=nil, &block
         Smooth::Event.provider.subscribe(event_name) do |*args|
-          block.call(Smooth::Event.new(*args), event_name)
+          event = Smooth::Event.new(*args)
+          aggregator << event if aggregator.respond_to?(:<<)
+          block.call(event, event_name) if block.respond_to?(:call)
         end
       end
     end
