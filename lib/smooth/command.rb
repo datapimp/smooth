@@ -66,8 +66,10 @@ class Smooth::Command < Mutations::Command
     value = @resource_name.to_s
 
     if value.empty? && model_class
-      model_class.to_s
+      value = model_class.to_s
     end
+
+    value
   end
 
   def event_namespace; self.class.event_namespace; end

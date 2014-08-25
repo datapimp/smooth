@@ -1,17 +1,18 @@
 $:.unshift File.dirname(__FILE__)
 
-begin
+load_dependencies = lambda do
   require 'hashie'
   require 'active_support/core_ext'
   require 'active_support/notifications'
   require 'active_model_serializers'
   require 'mutations'
-  require 'pry'
+end
+
+begin
+  load_dependencies.call()
 rescue LoadError
   require 'rubygems'
-  require 'hashie'
-  require 'active_support/core_ext'
-  require 'pry'
+  retry
 end
 
 
