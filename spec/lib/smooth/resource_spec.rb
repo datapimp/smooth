@@ -12,7 +12,7 @@ describe "The Smooth Resource" do
     expect(books.name).to eq("Books")
   end
 
-  it "should have a like command class" do
+  it "should have an arbitrary defined command class" do
     command = books.fetch(:command, :like)
     expect(command).to respond_to(:run)
   end
@@ -25,6 +25,14 @@ describe "The Smooth Resource" do
   it "should have a create command class" do
     command = books.fetch(:command, :create)
     expect(command).to respond_to(:run)
+  end
+
+  it "should return a reference to the serializer class" do
+    expect(books.serializer_class).to equal(BookSerializer)
+  end
+
+  it "should return a reference to the query class" do
+    expect(books.query_class).to equal(BookQuery)
   end
 
   it "should generate a default serializer" do

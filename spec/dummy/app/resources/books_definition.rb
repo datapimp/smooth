@@ -1,4 +1,5 @@
 resource "Books" do
+
   serializer do
     desc "A unique id for the book", :type => :integer
     attribute :id
@@ -10,6 +11,7 @@ resource "Books" do
     has_one :author
 
     desc "Documentation for computed property"
+
     def computed_property
       object.created_at
     end
@@ -55,15 +57,18 @@ resource "Books" do
   # This will create a class 'BookQuery'.  The build_scope method
   # is open for definition by the developer.
   query do
-    start_from :scope => :accessible_to
+    scope :accessible_to
 
     params do
       desc "The year the book was published (example: YYYY)"
-      integer :year_published
+      integer :year_published, operator: :gte
+
+      desc "A partial string to filter the title by"
+      string :title, operator: :like
     end
 
     role :admin do
-      start_from :scope => :all
+      scope :all
     end
   end
 

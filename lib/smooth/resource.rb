@@ -3,7 +3,8 @@ module Smooth
     include Smooth::Documentation
 
     attr_accessor :resource_name,
-                  :api_name
+                  :api_name,
+                  :model_class
 
     # These store the configuration values for the various
     # objects belonging to the resource.
@@ -14,20 +15,26 @@ module Smooth
                  :_examples
 
     def initialize(resource_name, options={}, &block)
-      @resource_name = resource_name
-      @options = options
+      @resource_name  = resource_name
+      @options        = options
 
-      @_serializers = {}.to_mash
-      @_commands    = {}.to_mash
-      @_queries     = {}.to_mash
-      @_routes      = {}.to_mash
-      @_examples    = {}.to_mash
+      @model_class    = options.fetch(:model, nil)
 
-      @loaded       = false
+      @_serializers   = {}.to_mash
+      @_commands      = {}.to_mash
+      @_queries       = {}.to_mash
+      @_routes        = {}.to_mash
+      @_examples      = {}.to_mash
+
+      @loaded         = false
 
       instance_eval(&block) if block_given?
 
       load!
+    end
+
+    def model_class
+      @model_class || (resource_name.singularize.constantize rescue nil)
     end
 
     def name
@@ -77,8 +84,6 @@ module Smooth
 
       config = _serializers[serializer_name.to_sym] ||= Hashie::Mash.new(options: {}, name: serializer_name, blocks: [block].compact)
       config.description = description unless description.nil?
-
-      config
     end
 
     def command command_name, *args, &block
@@ -126,6 +131,26 @@ module Smooth
       if options.empty? && !block_given?
         return @examples
       end
+    end
+
+    def serializer_class reference=:default
+      @serializers.fetch(reference, serializer_classes.first)
+    end
+
+    def query_class reference=:default
+      @queries.fetch(reference, query_classes.first)
+    end
+
+    def serializer_classes
+      @serializers && @serializers.values()
+    end
+
+    def query_classes
+      @queries && @queries.values()
+    end
+
+    def command_classes
+      @commands && @commands.values()
     end
 
     protected

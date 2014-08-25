@@ -9,7 +9,6 @@ class Smooth::Command < Mutations::Command
     RunProxy.new(current_user, self)
   end
 
-
   # DSL Improvements English
   def self.params *args, &block
     send(:required, *args, &block)
@@ -34,14 +33,20 @@ class Smooth::Command < Mutations::Command
   # to the scope method.  if you pass no args, and the scope requires one,
   # we will assume the user wants us to pass the current user of the command
   def scope *args
-    meth = model_class.send(:method, self.class.base_scope)
+    @scope ||= begin
+                meth = model_class.send(:method, self.class.base_scope)
 
-    if meth.arity.abs == 0
-      model_class.send(self.class.base_scope)
-    elsif meth.arity.abs == 1
-      args.push(current_user) if args.empty?
-      model_class.send(self.class.base_scope, *args)
-    end
+                if meth.arity.abs >= 1
+                  args.push(current_user) if args.empty?
+                  model_class.send(self.class.base_scope, *args)
+                else
+                  model_class.send(self.class.base_scope)
+                end
+               end
+  end
+
+  def scope= new_scope
+    @scope = new_scope || scope
   end
 
   def self.scope setting=nil
@@ -58,15 +63,11 @@ class Smooth::Command < Mutations::Command
   end
 
   def self.resource_name
-    @resource_name.to_s
-  end
+    value = @resource_name.to_s
 
-  def self.model_class
-    @model_class ||= begin
-                       Object.const_get(resource_name.camelize)
-                     rescue LoadError
-                       Object.const_get(resource_name.singularize.camelize) rescue nil
-                     end
+    if value.empty? && model_class
+      model_class.to_s
+    end
   end
 
   def event_namespace; self.class.event_namespace; end
@@ -95,13 +96,17 @@ class Smooth::Command < Mutations::Command
     name = options.name.to_s.camelize
     klass = "#{ name }#{ resource_name }"
 
-    if command_klass = Object.const_get(klass) rescue nil
-      return command_klass
-    end
+    apply_options = lambda do |k|
+      k.model_class     ||= resource.model_class if resource.model_class
 
-    Object.const_set(klass, Class.new(base)).tap do |k|
       k.resource_name   = resource.name.to_s
       k.command_action  = options.name.to_s
     end
+
+    if command_klass = Object.const_get(klass) rescue nil
+      return command_klass.tap(&apply_options)
+    end
+
+    Object.const_set(klass, Class.new(base)).tap(&apply_options)
   end
 end
