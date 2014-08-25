@@ -5,7 +5,7 @@ module Smooth
     include Smooth::Documentation
 
     def self.default
-      @default ||= Smooth::Api.new
+      @default ||= Smooth::Api.new(:default)
     end
 
     attr_accessor :name,
@@ -14,7 +14,7 @@ module Smooth
                   :_policies
 
     def initialize(name, options={})
-      @name       = name
+      @name       = name.to_s
       @options    = options
 
       @_resources   = {}

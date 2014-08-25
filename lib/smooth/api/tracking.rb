@@ -24,7 +24,7 @@ module Smooth
       end
 
       def current_api_name
-        (@@current_api_name || :default).to_sym
+        (@@current_api_name ||= :default).to_sym
       end
     end
   end

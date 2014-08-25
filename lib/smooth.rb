@@ -35,6 +35,7 @@ module Smooth
   extend Smooth::Api::Tracking
   extend Smooth::Resource::Tracking
   extend Smooth::Event::Adapter
+  extend Smooth::Dsl
 
   def self.command
     config.command_class
@@ -66,4 +67,7 @@ module Smooth
     end
 
   end if defined?(::Rails)
+
+  require 'smooth/model_adapter'
+  ActiveRecord::Base.send(:include, Smooth::ModelAdapter) if defined?(ActiveRecord::Base)
 end
