@@ -12,7 +12,8 @@ module Smooth
                  :_commands,
                  :_serializers,
                  :_routes,
-                 :_examples
+                 :_examples,
+                 :object_descriptions
 
     def initialize(resource_name, options={}, &block)
       @resource_name  = resource_name
@@ -26,11 +27,55 @@ module Smooth
       @_routes        = {}.to_mash
       @_examples      = {}.to_mash
 
+      @object_descriptions = {
+        commands: {},
+        queries: {},
+        serializers: {},
+        routes: {},
+        examples: {}
+      }
+
       @loaded         = false
 
       instance_eval(&block) if block_given?
 
       load!
+    end
+
+    def interface_documentation
+      resource = self
+
+      @interface ||= begin
+                       resource.object_descriptions.keys.inject({}) do |memo, type|
+                         memo.tap do
+                           bucket = memo[type] ||= {}
+                           resource.send("available_#{ type }").each do |object_name|
+                             docs = resource.expanded_documentation_for(type, object_name)
+                             bucket[object_name] = docs
+                           end
+                         end
+                       end
+                     end.to_mash
+    end
+
+    def available_commands
+      _commands.keys
+    end
+
+    def available_queries
+      _queries.keys
+    end
+
+    def available_serializers
+      _serializers.keys
+    end
+
+    def available_routes
+      _routes.keys
+    end
+
+    def available_examples
+      _examples.keys
     end
 
     def model_class
@@ -43,12 +88,12 @@ module Smooth
 
     def fetch_config object_type, object_key
       source = send("_#{ object_type }s") rescue nil
-      source && source.fetch(object_key.to_sym)
+      source && source.fetch(object_key.to_s.downcase.to_sym)
     end
 
     def fetch object_type, object_key
       source = instance_variable_get("@#{ object_type }s") rescue nil
-      source && source.fetch(object_key.to_sym)
+      source && source.fetch(object_key.to_s.downcase.to_sym)
     end
 
     def loaded?
@@ -71,6 +116,34 @@ module Smooth
       @options.send(:merge!, *opts)
     end
 
+    def describe_object object_type, object_name, with_value={}
+      bucket = self.documentation_for(object_type, object_name)
+
+      with_value = {description: with_value} if with_value.is_a?(String)
+
+      bucket[:description] = with_value.fetch(:description, with_value["description"])
+      bucket[:description_args] = with_value.fetch(:args, [])
+    end
+
+    def documentation_for object_type, object_name
+      self.object_descriptions[object_type.to_s.pluralize.to_sym][object_name.to_sym] ||= {}
+    end
+
+    def expanded_documentation_for object_type, object_name
+      base = documentation_for(object_type, object_name)
+      klass = object_class_for(object_type, object_name)
+
+      base.merge!(class: klass.to_s, interface: klass && klass.interface_documentation)
+    end
+
+    def object_class_for object_type, object_name
+      begin
+        fetch(object_type.to_s.singularize.to_sym, object_name.to_sym)
+      rescue => e
+        binding.pry
+      end
+    end
+
     def serializer serializer_name="Default", *args, &block
       if args.empty? && !block_given? && exists = fetch(:serializer, serializer_name)
         return exists
@@ -78,12 +151,16 @@ module Smooth
 
       options = args.extract_options!
 
-      description = options.fetch(:description) do
-        args.first || inline_description
-      end
+      provided_description = options.fetch(:description, inline_description)
 
-      config = _serializers[serializer_name.to_sym] ||= Hashie::Mash.new(options: {}, name: serializer_name, blocks: [block].compact)
-      config.description = description unless description.nil?
+      describe_object(:serializer, serializer_name.downcase, provided_description) unless provided_description.empty?
+
+      specified_class = args.first
+      specified_class = specified_class.constantize if specified_class.is_a?(String)
+      specified_class = nil if specified_class && !(specified_class <= Smooth.config.serializer_class)
+
+      config = _serializers[serializer_name.downcase.to_sym] ||= Hashie::Mash.new(options: {}, name: serializer_name, blocks: [block].compact, class: specified_class)
+      config.description = provided_description unless provided_description.nil?
     end
 
     def command command_name, *args, &block
@@ -93,14 +170,18 @@ module Smooth
 
       options = args.extract_options!
 
-      description = options.fetch(:description) do
-        args.first || inline_description
-      end
+      provided_description = options.fetch(:description, inline_description)
 
-      config = _commands[command_name.to_sym] ||= Hashie::Mash.new(options: {}, name: command_name, blocks: [block].compact)
+      describe_object(:command, command_name.downcase, provided_description) unless provided_description.empty?
+
+      specified_class = args.first
+      specified_class = (specified_class.constantize rescue nil) if specified_class.is_a?(String)
+      specified_class = nil if specified_class && !(specified_class <= Smooth.config.command_class)
+
+      config = _commands[command_name.to_sym] ||= Hashie::Mash.new(options: {}, name: command_name, blocks: [block].compact, class: specified_class)
 
       config.options.merge!(options)
-      config.description = description unless description.nil?
+      config.description = provided_description unless provided_description.nil?
 
       config
     end
@@ -112,13 +193,17 @@ module Smooth
 
       options = args.extract_options!
 
-      description = options.fetch(:description) do
-        args.first || inline_description
-      end
+      provided_description = options.fetch(:description, inline_description)
 
-      config = _queries[query_name.to_sym] ||= Hashie::Mash.new(options: {}, name: query_name, blocks: [block].compact)
+      describe_object(:query, query_name.downcase, provided_description) unless provided_description.empty?
+
+      specified_class = args.first
+      specified_class = (specified_class.constantize rescue nil) if specified_class.is_a?(String)
+      specified_class = nil if specified_class && !(specified_class <= Smooth.config.query_class)
+
+      config = _queries[query_name.downcase.to_sym] ||= Hashie::Mash.new(options: {}, name: query_name, blocks: [block].compact, class: specified_class)
       config.options.merge!(options)
-      config.description = description unless description.nil?
+      config.description = provided_description unless provided_description.nil?
 
       config
     end
@@ -160,7 +245,7 @@ module Smooth
 
       @commands = _commands.inject({}.to_mash) do |memo, p|
         ref, cfg = p
-        memo[cfg.name] = Smooth::Command.configure(cfg, resource)
+        memo[cfg.name.downcase] = Smooth::Command.configure(cfg, resource)
         memo
       end
     end
@@ -170,7 +255,7 @@ module Smooth
 
       @serializers = _serializers.inject({}.to_mash) do |memo, p|
         ref, cfg = p
-        memo[cfg.name] = Smooth::Serializer.configure(cfg, resource)
+        memo[cfg.name.downcase] = Smooth::Serializer.configure(cfg, resource)
         memo
       end
     end
@@ -180,7 +265,7 @@ module Smooth
 
       @queries = _queries.inject({}.to_mash) do |memo, p|
         ref, cfg = p
-        memo[cfg.name] = Smooth::Query.configure(cfg, resource)
+        memo[cfg.name.downcase] = Smooth::Query.configure(cfg, resource)
         memo
       end
     end

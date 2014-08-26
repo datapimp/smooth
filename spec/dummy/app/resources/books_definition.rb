@@ -1,5 +1,6 @@
 resource "Books" do
 
+  desc "The default serializer for book"
   serializer do
     desc "A unique id for the book", :type => :integer
     attribute :id
@@ -19,7 +20,8 @@ resource "Books" do
 
   # This will create a class 'UpdateBook'.  The execute method
   # is open for definition by the developer.
-  command :update, "Update a book's attributes" do
+  desc "Update a book's attributes"
+  command :update do
     # Will ensure the command is run with
     # Book.accessible_to(current_user).find(id).
     scope :accessible_to
@@ -33,7 +35,8 @@ resource "Books" do
     end
   end
 
-  command :create, "Add a new book to the library" do
+  desc "Create a book"
+  command :create do
     scope :accessible_to
 
     params do
@@ -41,7 +44,8 @@ resource "Books" do
     end
   end
 
-  command :like, 'Toggle liking on/off for a book' do
+  desc "Toggle whether you like a book or not"
+  command :like do
     scope :all
 
     params do
@@ -53,6 +57,9 @@ resource "Books" do
       end
     end
   end
+
+  desc "Here we just define a relationship to a known class"
+  command :criticize, (CriticizeBook = Class.new(Smooth::Command))
 
   # This will create a class 'BookQuery'.  The build_scope method
   # is open for definition by the developer.

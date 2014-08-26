@@ -10,6 +10,7 @@ describe "The Smooth Query" do
 
   it "should work when the class is defined directly, as well as when it is defined via the dsl" do
     expect(BookQuery.developer_defined_method).to eq(true)
+    expect(BookQuery.new.inline_dsl_method).to eq(true)
   end
 
   it "should return some books" do

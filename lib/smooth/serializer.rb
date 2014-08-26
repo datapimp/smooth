@@ -61,6 +61,10 @@ module Smooth
       attribute_descriptions.merge(relationship_descriptions).to_mash
     end
 
+    def self.interface_documentation
+      documentation
+    end
+
     def self.attribute attr, options={}
       documented = inline_description
 

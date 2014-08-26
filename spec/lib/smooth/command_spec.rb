@@ -1,7 +1,8 @@
 require "spec_helper"
 
 describe "The Smooth Command" do
-  let(:command) { Smooth.current_api.resource("Books").fetch(:command, :like) }
+  let(:books) { Smooth.current_api.resource("Books") }
+  let(:command) { books.fetch(:command, :like) }
 
   it "should know the resource name" do
     expect(command.resource_name).to eq("Books")
@@ -20,6 +21,10 @@ describe "The Smooth Command" do
   end
 
   describe "Interface Documentation" do
+    it "should document the interface" do
+      expect(command.interface_documentation).not_to be_empty
+    end
+
     it "should allow for descriptions of the filters" do
       expected = "You can manually pass true or false.  If you leave it off, it will toggle the liking status"
       expect(command.input_descriptions[:like]).to eq(expected)

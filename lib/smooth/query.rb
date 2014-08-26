@@ -84,66 +84,6 @@ module Smooth
       send(:optional, *args, &block)
     end
 
-    # Returns info about the specific filter by its parameter / key
-    def interface_for filter
-      self.class.interface_description.filters.send(filter)
-    end
-
-    def operator_for filter
-      specific = interface_for(filter).options.operator
-      return specific if specific
-      :eq
-    end
-
-    def operator_and_type_for filter
-      [operator_for(filter),interface_for(filter).type]
-    end
-
-    def self.interface_description
-      return @interface_description if @interface_description
-
-      optional_inputs = input_filters.optional_inputs
-      required_inputs = input_filters.required_inputs
-
-      data = {
-        required: required_inputs.keys,
-        optional: optional_inputs.keys,
-        filters: {}
-      }
-
-      blk = lambda do |memo, parts, required|
-        key, filter = parts
-
-        type        = filter.class.name[/^Mutations::([a-zA-Z]*)Filter$/, 1].underscore
-        options     = filter.options.merge(required: required)
-
-        memo[key] = {
-          type: type,
-          options: options.reject {|k,v| v.nil? },
-          description: input_descriptions[key]
-        }
-
-        memo
-      end
-
-      required_inputs.reduce(data[:filters]) do |memo, parts|
-        blk.call(memo, parts, true)
-      end
-
-      optional_inputs.reduce(data[:filters]) do |memo, parts|
-        blk.call(memo, parts, false)
-      end
-
-      @interface_description = data.to_mash
-    end
-
-    def self.filter_for_param(param)
-    end
-
-    def self.filter_options_for_param(param)
-      filter_for_param(param).try(:options)
-    end
-
     def self.role name, &block
       @current_config = name
       instance_eval(&block) if block_given?

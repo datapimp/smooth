@@ -18,6 +18,10 @@ class Smooth::Command < Mutations::Command
     send(:required, *args, &block)
   end
 
+  def self.input_argument_names
+    required_inputs.keys + optional_inputs.keys
+  end
+
   # Commands are aware of who is running them
   attr_accessor :current_user
 
@@ -111,4 +115,70 @@ class Smooth::Command < Mutations::Command
 
     Object.const_set(klass, Class.new(base)).tap(&apply_options)
   end
+
+  # Interface Documentation
+  #
+    def interface_for filter
+      self.class.interface_description.filters.send(filter)
+    end
+
+    def operator_for filter
+      specific = interface_for(filter).options.operator
+      return specific if specific
+      :eq
+    end
+
+    def operator_and_type_for filter
+      [operator_for(filter),interface_for(filter).type]
+    end
+
+    def self.interface_description
+      interface_documentation
+    end
+
+    def self.interface_documentation
+      optional_inputs = input_filters.optional_inputs
+      required_inputs = input_filters.required_inputs
+
+      data = {
+        required: required_inputs.keys,
+        optional: optional_inputs.keys,
+        filters: {}
+      }
+
+      blk = lambda do |memo, parts, required|
+        key, filter = parts
+
+        type        = filter.class.name[/^Mutations::([a-zA-Z]*)Filter$/, 1].underscore
+        options     = filter.options.merge(required: required)
+
+        memo[key] = {
+          type: type,
+          options: options.reject {|k,v| v.nil? },
+          description: input_descriptions[key]
+        }
+
+        memo
+      end
+
+      required_inputs.reduce(data[:filters]) do |memo, parts|
+        blk.call(memo, parts, true)
+      end
+
+      optional_inputs.reduce(data[:filters]) do |memo, parts|
+        blk.call(memo, parts, false)
+      end
+
+      data.to_mash
+    end
+
+    def self.filter_for_param(param)
+      optional_inputs[param] || required_inputs[param]
+    end
+
+    def self.filter_options_for_param(param)
+      filter_for_param(param).try(:options)
+    end
+
+
 end
