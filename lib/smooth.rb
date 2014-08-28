@@ -28,6 +28,7 @@ require "smooth/query"
 require "smooth/resource"
 require "smooth/serializer"
 
+require "smooth/model_adapter"
 require "smooth/user_adapter"
 
 require "smooth/configuration"
@@ -59,18 +60,37 @@ module Smooth
     Smooth::Event::Proxy
   end
 
-  class Engine < ::Rails::Engine
-    initializer 'smooth.load_resources', :before => :build_middleware_stack do |app|
-      app_root = app.config.root.join("app")
+  def self.root
+    Pathname(Dir.pwd())
+  end
 
-      %w{smooth apis resources}.each do |check_folder|
-        app_root.join(check_folder).children.each {|f| require(f) } if app_root.join(check_folder).exist?
-      end
+  def self.eager_load_from_app_folders
+    return unless config.eager_load_app_folders
+
+    config.app_folder_paths.each do |folder|
+      folder.children.select {|p| p.extname == '.rb' }.each {|f| require(f) }
+    end
+  end
+
+  if defined?(::Rails)
+    def self.root
+      ::Rails.root
     end
 
-  end if defined?(::Rails)
+    class Engine < ::Rails::Engine
+      initializer 'smooth.load_resources', :before => :build_middleware_stack do |app|
+        app_root = app.config.root.join("app")
 
-  require 'smooth/model_adapter'
+        %w{smooth apis resources}.each do |check_folder|
+          app_root.join(check_folder).children.each {|f| require(f) } if app_root.join(check_folder).exist?
+        end
+
+        Smooth.eager_load_from_app_folders()
+      end
+    end
+  end
+
+
   ActiveRecord::Base.send(:include, Smooth::ModelAdapter) if defined?(ActiveRecord::Base)
 end
 

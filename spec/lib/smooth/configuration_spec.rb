@@ -13,4 +13,8 @@ describe "Smooth Configuration" do
   it "should enable event tracking by default" do
     expect(Smooth.config.enable_event_tracking?).to eq(true)
   end
+
+  it "should enable loading app folders by default" do
+    expect(Smooth.config.eager_load_app_folders?).to eq(true)
+  end
 end

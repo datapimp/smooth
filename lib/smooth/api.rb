@@ -71,7 +71,7 @@ module Smooth
 
       elsif block_given?
         obj = Smooth::Api::Policy.new(policy_name, options, &block)
-        _resources[policy_name.to_sym] = obj
+        _policies[policy_name.to_sym] = obj
       end
     end
 
@@ -82,11 +82,12 @@ module Smooth
     def resource resource_name, options={}, &block
       api_name = self.name
 
-      if existing = _resources[resource_name.to_sym]
+      existing = _resources[resource_name.to_s.downcase]
+
+      if existing
         existing.apply_options(options) unless options.empty?
         existing.instance_eval(&block) if block_given?
         existing
-
       elsif options.empty? && !block_given?
         existing = nil
 
@@ -95,7 +96,7 @@ module Smooth
           obj.api_name = api_name
         end
 
-        _resources[resource_name.to_sym] = created
+        _resources[resource_name.to_s.downcase] = created
       end
     end
 

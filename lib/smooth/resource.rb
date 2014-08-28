@@ -88,12 +88,14 @@ module Smooth
 
     def fetch_config object_type, object_key
       source = send("_#{ object_type }s") rescue nil
+      source = @_queries if object_type.to_sym == :query
       source && source.fetch(object_key.to_s.downcase.to_sym)
     end
 
     def fetch object_type, object_key
       source = instance_variable_get("@#{ object_type }s") rescue nil
-      source && source.fetch(object_key.to_s.downcase.to_sym)
+      source = @queries if object_type.to_sym == :query
+      source && source.fetch(object_key.to_s.downcase)
     end
 
     def loaded?
