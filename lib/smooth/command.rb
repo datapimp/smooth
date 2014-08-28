@@ -31,6 +31,10 @@ class Smooth::Command < Mutations::Command
                   :model_class,
                   :base_scope
 
+  def self.base_scope
+    @base_scope || :all
+  end
+
   # Returns the model scope for this command.  If a scope method
   # is set on this command, it will make sure to scope the model
   # by that method.  It will pass whatever arguments you pass to scope
