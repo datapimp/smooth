@@ -28,6 +28,8 @@ require "smooth/query"
 require "smooth/resource"
 require "smooth/serializer"
 
+require "smooth/user_adapter"
+
 require "smooth/configuration"
 require "smooth/version"
 
@@ -70,4 +72,24 @@ module Smooth
 
   require 'smooth/model_adapter'
   ActiveRecord::Base.send(:include, Smooth::ModelAdapter) if defined?(ActiveRecord::Base)
+end
+
+class Object
+  # Provides a global helper for looking up things in the Smooth object system.
+  #
+  # Example:
+  #
+  #   Smooth() #=> returns the current api
+  #   Smooth('books') #=> returns the books resource
+  #   Smooth('books.create') #=> returns the create command, for the books resource
+  #
+  def Smooth api_or_resource_name=nil
+    return Smooth.current_api if api_or_resource_name.nil?
+
+    if api_or_resource_name.to_s.include?(Smooth.config.object_path_separator)
+      return Smooth.current_api.lookup_object_by(api_or_resource_name)
+    end
+
+    Smooth.fetch_api(api_or_resource_name) || Smooth.current_api.resource(api_or_resource_name)
+  end
 end

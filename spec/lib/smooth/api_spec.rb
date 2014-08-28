@@ -19,5 +19,13 @@ describe "The Smooth API Definition" do
   it "should have a version" do
     expect(api.version).to equal(:v1)
   end
+
+  it "should lookup objects by a shortcut alias / path" do
+    expect(api.lookup_object_by("books")).to be_a(Smooth::Resource)
+    expect(api.lookup_object_by("books.create")).to eq(CreateBook)
+    expect(api.lookup_object_by("books.like")).to eq(LikeBook)
+    expect(api.lookup_object_by("books.query")).to eq(BookQuery)
+    expect(api.lookup_object_by("books.serializer")).to eq(BookSerializer)
+  end
 end
 

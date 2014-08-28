@@ -21,6 +21,40 @@ module Smooth
       @_policies    = {}
     end
 
+    def as(current_user, &block)
+      proxy = DslProxy.new(current_user, self)
+      proxy.instance_eval(&block) if block_given?
+      proxy
+    end
+
+    def lookup_object_by path
+      path = path.to_s
+      resource_name, object_name = path.split(Smooth.config.object_path_separator)
+
+      resource_object = resource(resource_name)
+
+      case
+      when object_name == "query" || object_name == "serializer"
+        resource_object.fetch(object_name.to_sym, :default)
+      when object_name.nil?
+        resource_object
+      else
+        resource_object.fetch(:command, object_name)
+      end
+    end
+
+    def resource_names
+      _resources.keys
+    end
+
+    def interface_documentation
+      resource_names.inject({}) do |memo, resource_name|
+        memo.tap do
+          memo[resource_name.to_s] = resource(resource_name).interface_documentation
+        end
+      end
+    end
+
     def version config=nil
       @_version_config = config if config
       @_version_config
@@ -65,6 +99,27 @@ module Smooth
       end
     end
 
+  end
+
+  class DslProxy
+    def initialize(current_user, api)
+      @current_user = current_user
+      @api = api
+    end
+
+    def query resource_name, *args
+      params = args.extract_options!
+      query_name = args.first || :default
+      @api.resource(resource_name).fetch(:query, query_name).as(@current_user).run(params)
+    end
+
+    def run_command resource_name, *args
+      params = args.extract_options!
+      command_name = args.first
+      path = resource_name if command_name.nil?
+      path = "#{ resource_name }.#{ command_name }" if command_name.present?
+      @api.lookup_object_by(path).as(@current_user).run(params)
+    end
   end
 end
 
