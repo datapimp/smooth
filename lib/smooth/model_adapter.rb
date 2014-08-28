@@ -4,6 +4,12 @@ module Smooth
       base.extend(ClassMethods)
     end
 
+    def query(current_user, params={})
+      self.class.smooth_resource.fetch(:query, :default)
+        .as(current_user)
+        .run(params)
+    end
+
     module ClassMethods
       def acts_smooth options={}, &block
         @smooth_resource ||= begin
