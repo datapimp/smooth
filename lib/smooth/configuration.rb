@@ -7,12 +7,17 @@ module Smooth
     cattr_accessor :query_class,
                    :command_class,
                    :serializer_class,
-                   :enable_events
+                   :object_path_separator,
+                   :enable_events,
+                   :definition_folders
 
-    @@query_class       = Smooth::Query
-    @@command_class     = Smooth::Command
-    @@serializer_class  = defined?(ApplicationSerializer) ? ApplicationSerializer : Smooth::Serializer
-    @@enable_events     = true
+
+    @@query_class               = Smooth::Query
+    @@command_class             = Smooth::Command
+    @@serializer_class          = defined?(ApplicationSerializer) ? ApplicationSerializer : Smooth::Serializer
+    @@enable_events             = true
+    @@object_path_separator     = '.'
+    @@definition_folders        = %w{app/models app/resources app/queries app/commands app/serializers}
 
     def enable_event_tracking?
       !!@@enable_events
