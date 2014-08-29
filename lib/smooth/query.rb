@@ -15,6 +15,20 @@ module Smooth
       params.each(&method(:apply_filter))
     end
 
+    def operator_for filter
+      specific = interface_for(filter).options.operator
+      return specific if specific
+      :eq
+    end
+
+    def operator_and_type_for filter
+      [operator_for(filter),interface_for(filter).type]
+    end
+
+    def column_for key
+      interface_for(key).options.column || key
+    end
+
     def apply_filter *parts
       key, value = parts.flatten
 
@@ -23,7 +37,8 @@ module Smooth
       value = "%#{value}%" if operator == :like
       operator = :matches if operator == :like
 
-      condition = arel_table[key].send(operator, value)
+      column = column_for(key)
+      condition = arel_table[column].send(operator, value)
 
       self.scope = self.scope.merge(self.scope.where(condition))
     end

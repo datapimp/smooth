@@ -126,16 +126,6 @@ class Smooth::Command < Mutations::Command
       self.class.interface_description.filters.send(filter)
     end
 
-    def operator_for filter
-      specific = interface_for(filter).options.operator
-      return specific if specific
-      :eq
-    end
-
-    def operator_and_type_for filter
-      [operator_for(filter),interface_for(filter).type]
-    end
-
     def self.interface_description
       interface_documentation
     end

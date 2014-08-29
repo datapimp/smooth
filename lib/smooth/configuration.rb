@@ -1,4 +1,5 @@
 require 'singleton'
+require 'yaml'
 
 module Smooth
   class Configuration
@@ -10,7 +11,12 @@ module Smooth
                    :object_path_separator,
                    :enable_events,
                    :definition_folders,
-                   :eager_load_app_folders
+                   :eager_load_app_folders,
+                   :active_record_config,
+                   :models_path,
+                   :schema_file,
+                   :migrations_path,
+                   :root
 
 
     @@query_class               = Smooth::Query
@@ -18,19 +24,36 @@ module Smooth
     @@serializer_class          = defined?(ApplicationSerializer) ? ApplicationSerializer : Smooth::Serializer
     @@enable_events             = true
     @@eager_load_app_folders    = true
+    @@models_path               = "app/models"
     @@object_path_separator     = '.'
-    @@definition_folders        = %w{app/models app/resources app/queries app/commands app/serializers}
+    @@definition_folders        = %w{app/models app/apis app/queries app/commands app/serializers app/resources }
+
+    @@active_record_config      = 'config/database.yml'
+    @@schema_file               = 'db/schema.rb'
+    @@migrations_path           = 'db/migrate'
+    @@root                      = Dir.pwd()
+
+    def active_record
+      return active_record_config if active_record_config.is_a?(Hash)
+      file = root.join(active_record_config)
+      raise 'The config file does not exist at ' + file.to_s unless file.exist?
+      YAML::load(file.open).fetch(Smooth.env)
+    end
 
     def enable_event_tracking?
       !!@@enable_events
     end
 
     def root
-      Smooth.root
+      Pathname(@@root)
     end
 
     def app_folder_paths
-      Smooth.config.definition_folders.map {|f| root.join(f) }
+      Array(definition_folders).map {|f| root.join(f) }
+    end
+
+    def models_path
+      root.join(@@models_path)
     end
 
     def method_missing meth, *args, &block

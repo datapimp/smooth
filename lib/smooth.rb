@@ -1,15 +1,24 @@
 $:.unshift File.dirname(__FILE__)
 
-load_dependencies = lambda do
-  require 'hashie'
+load_active_dependencies = lambda do
   require 'active_support/core_ext'
   require 'active_support/notifications'
+  require 'active_record'
+end
+
+load_dependencies = lambda do
+  require 'hashie'
   require 'active_model_serializers'
   require 'mutations'
+  require 'logger'
 end
 
 begin
   load_dependencies.call()
+
+  unless defined?(::Rails)
+    load_active_dependencies.call()
+  end
 rescue LoadError
   require 'rubygems'
   retry
@@ -28,6 +37,7 @@ require "smooth/query"
 require "smooth/resource"
 require "smooth/serializer"
 
+require "smooth/active_record/adapter"
 require "smooth/model_adapter"
 require "smooth/user_adapter"
 
@@ -52,24 +62,49 @@ module Smooth
     config.serializer_class
   end
 
-  def self.config
-    Smooth::Configuration.instance
+  def self.config &block
+    block_given = block_given?
+    Smooth::Configuration.instance.tap do |cfg|
+      cfg.instance_eval(&block) if block_given
+    end
   end
 
   def self.events
     Smooth::Event::Proxy
   end
 
-  def self.root
-    Pathname(Dir.pwd())
-  end
-
   def self.eager_load_from_app_folders
     return unless config.eager_load_app_folders
 
     config.app_folder_paths.each do |folder|
+      next unless folder.exist?
+
       folder.children.select {|p| p.extname == '.rb' }.each {|f| require(f) }
     end
+  end
+
+  def self.app
+    @application || raise("Application not initialized")
+  end
+
+  def self.application options={}, &block
+    @application ||= Smooth::Application.new(options, &block)
+  end
+
+  def self.root
+    Smooth.config.root
+  end
+
+  def self.models_path
+    config.models_path
+  end
+
+  def self.active_record
+    Smooth::AR::Adapter
+  end
+
+  def self.env
+    ENV['SMOOTH_ENV'] || ENV['RACK_ENV'] || ENV['RAILS_ENV'] || "development"
   end
 
   if defined?(::Rails)
@@ -79,10 +114,10 @@ module Smooth
 
     class Engine < ::Rails::Engine
       initializer 'smooth.load_resources', :before => :build_middleware_stack do |app|
-        app_root = app.config.root.join("app")
-
-        %w{smooth apis resources}.each do |check_folder|
-          app_root.join(check_folder).children.each {|f| require(f) } if app_root.join(check_folder).exist?
+        %w{app/smooth app/apis app/resources}.each do |check|
+          if (folder = app.root.join(check)).exist?
+            folder.children.select {|f| f.extname == '.rb'}.each {|f| require(f) }
+          end
         end
 
         Smooth.eager_load_from_app_folders()
