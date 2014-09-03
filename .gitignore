@@ -22,3 +22,4 @@ spec/dummy/db/*.sqlite3
 *.sqlite3
 .vimrc
 test-examples/
+front-end/
