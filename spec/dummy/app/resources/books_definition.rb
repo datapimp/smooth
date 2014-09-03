@@ -1,5 +1,4 @@
 resource "Books" do
-
   desc "The default serializer for book"
   serializer do
     desc "A unique id for the book", :type => :integer

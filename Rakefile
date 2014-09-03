@@ -1,4 +1,5 @@
 require "bundler/gem_tasks"
+require 'pry'
 
 #!/usr/bin/env rake
 begin

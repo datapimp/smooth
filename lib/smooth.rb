@@ -114,9 +114,11 @@ module Smooth
 
     class Engine < ::Rails::Engine
       initializer 'smooth.load_resources', :before => :build_middleware_stack do |app|
-        %w{app/smooth app/apis app/resources}.each do |check|
+        %w{app/apis app/resources}.each do |check|
           if (folder = app.root.join(check)).exist?
-            folder.children.select {|f| f.extname == '.rb'}.each {|f| require(f) }
+            folder.children.select {|f| f.extname == '.rb'}.each do |f|
+              require(f)
+            end
           end
         end
 

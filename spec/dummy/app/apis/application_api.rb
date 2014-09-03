@@ -8,7 +8,7 @@ api "My Application" do
 
     # commands / queries can be set to true or false to allow
     # all commands and queries defined for the books resource.
-    allow :books, :commands => false, :queries => true
+    #allow :books, :commands => false, :queries => true
 
     # we can also pass an array of queries or commands
     # allow :books, :commands => [:like]
@@ -17,7 +17,7 @@ api "My Application" do
   desc "Authenticated users register and are given an auth token"
   policy :logged_in_users do
     authenticate_with :header => 'X-AUTH-TOKEN', :param => :auth_token
-    allow :books, :commands => true, :queries => true
+    #allow :books, :commands => true, :queries => true
   end
 
   desc "Admin users have the admin flag set to true"
