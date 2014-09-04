@@ -26,6 +26,10 @@ module Smooth
       sinatra.call(env)
     end
 
+    def inspect
+      "Smooth API: #{ name } Resources: #{ resource_names }"
+    end
+
     def as(current_user, &block)
       proxy = DslProxy.new(current_user, self)
       proxy.instance_eval(&block) if block_given?
