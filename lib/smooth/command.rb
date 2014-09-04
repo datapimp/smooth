@@ -184,7 +184,37 @@ class Smooth::Command < Mutations::Command
     end
 
     def self.handle_request(request_object)
-      as(request_object.user).run(request_object.params)
+      outcome = as(request_object.user).run(request_object.params)
+
+      if outcome.success?
+        [200, {}, find_serializer_for(request_object).serialize_object(outcome.result, serializer_options)]
+      else
+        [400, {}, outcome.errors.message]
+      end
     end
 
+    def self.serializer_options
+      {}
+    end
+
+    def self.find_serializer_for(request_object)
+      resource = Smooth.resource(resource_name)
+      resource ||= Smooth.resource("#{ resource_name }".pluralize)
+
+      resource.fetch(:serializer, :default)
+    end
+
+    # Allows for defining common execution pattern methods
+    # mostly for standard CRUD against scoped models
+    def self.execute(execution_pattern=nil, &block)
+      send :define_method, :execute, (block || get_execution_pattern(execution_pattern))
+    end
+
+    def self.get_execution_pattern(pattern_name)
+      if respond_to?("#{ pattern_name }_execution_pattern")
+        return method("#{ pattern_name }_execution_pattern").to_proc
+      else
+        return method(:execute).to_proc
+      end
+    end
 end

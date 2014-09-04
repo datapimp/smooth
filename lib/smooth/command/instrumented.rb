@@ -35,7 +35,7 @@ module Smooth
         if outcome.success?
           result = outcome.result
           track_event("#{ event_namespace }", result: result, inputs: inputs, current_user: current_user)
-          result
+          outcome
         else
           track_event("errors/#{ event_namespace }", errors: outcome.errors, inputs: inputs, current_user: current_user)
           outcome

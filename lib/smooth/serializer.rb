@@ -103,5 +103,9 @@ module Smooth
 
       super
     end
+
+    def self.serialize_object(object, options={})
+      new(object).as_json(options)
+    end
   end
 end

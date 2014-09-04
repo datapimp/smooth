@@ -35,22 +35,17 @@ module Smooth
                 args: args
               }
             rescue => exception
-              return {
-                error: exception.message,
-                stage: "request"
-              }.to_json
+              halt 500, {}, { error: exception.message, stage: "request" }.to_json
             end
 
-            response = begin
-                         handler.call(request.to_mash)
-                       rescue => exception
-                         {
-                           error: exception.message,
-                           stage: "response"
-                         }
-                       end
-
-            response.to_json
+            begin
+              r_status, r_headers, r_body = handler.call(request.to_mash)
+              status(r_status)
+              headers(r_headers.merge("Content-Type"=>"application/json"))
+              body(r_body.to_json)
+            rescue => exception
+              halt 500, {}, {error: exception.message, stage: "response"}.to_json
+            end
           end
         end
       end

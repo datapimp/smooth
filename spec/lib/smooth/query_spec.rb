@@ -19,13 +19,13 @@ describe "The Smooth Query" do
 
   it "should return some books" do
     Book.where(title:"Animal Farm").first_or_create()
-    expect(query.run(title: "Animal Farm").count).to eq(1)
+    expect(query.run(title: "Animal Farm").result.count).to eq(1)
   end
 
   it "should query the books resource" do
     Book.where(title:"Animal Farm").first_or_create()
-    expect(query.run(title: "Animal").count).to eq(1)
-    expect(query.run(title: "1984").count).to eq(0)
+    expect(query.run(title: "Animal").result.count).to eq(1)
+    expect(query.run(title: "1984").result.count).to eq(0)
   end
 
   it "should tell me info about the query interface" do

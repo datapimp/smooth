@@ -57,7 +57,7 @@ describe "The Smooth Command" do
 
       # This is just laziness since i don't have a user model yet.
       # I am just making sure that this value makes it to the scope anyway
-      book = k.as(2001).run(title:"sup")
+      book = k.as(2001).run(title:"sup").result
 
       expect(book.year_published).to eq(2001)
       expect(book.title).to eq("sup")
@@ -76,7 +76,7 @@ describe "The Smooth Command" do
         end
       end
 
-      expect(k.as(1).run(argument: 2)).to eq(3)
+      expect(k.as(1).run(argument: 2).result).to eq(3)
     end
   end
 
