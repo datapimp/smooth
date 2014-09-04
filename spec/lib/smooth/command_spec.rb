@@ -20,6 +20,13 @@ describe "The Smooth Command" do
     expect(command.model_class).to equal(Book)
   end
 
+  describe "Execution Patterns" do
+    it "should follow common execution patterns if specified" do
+      cmd = books.fetch(:command, :update)
+      expect(cmd.get_execution_pattern(:update)).to respond_to(:call)
+    end
+  end
+
   describe "Interface Documentation" do
     it "should document the interface" do
       expect(command.interface_documentation).not_to be_empty

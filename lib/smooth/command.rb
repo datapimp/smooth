@@ -229,9 +229,35 @@ class Smooth::Command < Mutations::Command
       send :define_method, :execute, (block || get_execution_pattern(execution_pattern))
     end
 
+    Patterns = {}
+
+    Patterns[:update] = lambda do
+      scoped_find_object.update_attributes(inputs)
+      scoped_find_object
+    end
+
+    Patterns[:create] = lambda do
+      scope.create(inputs)
+    end
+
+    Patterns[:destroy] = lambda do
+      scoped_find_object.destroy
+      scoped_find_object
+    end
+
+    def scoped_find_object
+      @scoped_find ||= if scope.respond_to?(:find) && found = (scope.find(id) rescue nil)
+        found
+      else
+        add_error(:id, :not_found, "could not find a #{ resource_name } model with that id")
+      end
+    end
+
     def self.get_execution_pattern(pattern_name)
       if respond_to?("#{ pattern_name }_execution_pattern")
         return method("#{ pattern_name }_execution_pattern").to_proc
+      elsif Patterns.has_key?(pattern_name.to_sym)
+        Patterns.fetch(pattern_name.to_sym)
       else
         return method(:execute).to_proc
       end

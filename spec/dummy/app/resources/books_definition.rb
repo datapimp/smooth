@@ -32,6 +32,8 @@ resource "Books" do
         string :title
       end
     end
+
+    execute(:update)
   end
 
   desc "Create a book"
