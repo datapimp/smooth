@@ -39,12 +39,13 @@ module Smooth
             end
 
             begin
-              r_status, r_headers, r_body = handler.call(request.to_mash)
-              status(r_status)
-              headers(r_headers.merge("Content-Type"=>"application/json"))
-              body(r_body.to_json)
+              response = handler.call(request.to_mash)
+
+              body response.body
+              headers response.headers
+              status response.status
             rescue => exception
-              halt 500, {}, {error: exception.message, stage: "response"}.to_json
+              halt 500, {}, {error: exception.message, backtrace: exception.backtrace, stage: "response"}.to_json
             end
           end
         end
@@ -141,17 +142,19 @@ module Smooth
         case
 
         when method == :get && signifier == :query
-          ->(req) { resource.fetch(:query, :default).handle_request(req) }
-        when method == :show && signifier == :show
-          ->(req) { resource.fetch(:query, :default).handle_request(req, show: true) }
+          ->(req) { resource.fetch(:query, :default).respond_to_request(req) }
+
+        when (method == :show || method == :get) && signifier == :show
+          ->(req) { resource.fetch(:query, :default).respond_to_find_request(req) }
+
         when method == :get
-          ->(req) { resource.fetch(:query, signifier).handle_request(req) }
-        when method == :put || method == :post || method == :delete && [:create,:update,:destroy].include?(signifier)
-          ->(req) { resource.fetch(:command, signifier).handle_request(req) }
+          ->(req) { resource.fetch(:query, signifier).respond_to_request(req) }
+
+        # Mutation Methods
         when method == :put || method == :post || method == :delete
-          ->(req) { resource.fetch(:command, signifier).handle_request(req) }
+          ->(req) { resource.fetch(:command, signifier).respond_to_request(req) }
         else
-          -> { {status: "Not Found" }.to_json }
+          ->(req) { Smooth::ErrorResponse.new("Unable to find matching route", req) }
         end
       end
 

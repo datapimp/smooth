@@ -115,13 +115,51 @@ module Smooth
       val
     end
 
-    def self.handle_request(request_object)
+    def self.respond_to_find_request request_object, options={}
       outcome = as(request_object.user).run(request_object.params)
 
-      if outcome.success?
-        [200, {}, find_serializer_for(request_object).serialize_object(outcome.result, serializer_options)]
-      else
-        [400, {}, outcome.errors.message]
+
+      Smooth::Response.new(nil).tap do |response|
+        response.command_action = :find
+        response.event_namespace = event_namespace
+        response.request_headers = request_object.headers
+
+        if outcome.success?
+          response.object = outcome.result.find(request_object.params[:id])
+          response.success = true
+          response.serializer = find_serializer_for(request_object)
+        end
+      end
+    end
+
+    def self.response_class
+      Smooth::Query::Response
+    end
+
+    class Response < Smooth::Response
+      def serializer
+        if command_action.to_sym == :find
+          @serializer
+        else
+          Smooth::ArraySerializer
+        end
+      end
+
+      def options
+        @serializer_options.tap do |o|
+          o[:each_serializer] = @serializer unless command_action == :find
+          o[:scope] = current_user
+        end
+      end
+
+      def object
+        return @object if @object
+
+        if command_action.to_sym == :find
+          outcome.result
+        elsif success? && command_action.to_sym == :query
+          outcome.result.to_a
+        end
       end
     end
 

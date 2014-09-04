@@ -29,15 +29,17 @@ module Smooth
         end
       end
 
-      def run_with_instrumentation
+      def run_with_instrumentation event_prefix=nil
         outcome = run_with_outcome
+
+        event_prefix = "#{ event_prefix }." if event_prefix
 
         if outcome.success?
           result = outcome.result
-          track_event("#{ event_namespace }", result: result, inputs: inputs, current_user: current_user)
+          track_event("#{ event_prefix }#{ event_namespace }", result: result, inputs: inputs, current_user: current_user)
           outcome
         else
-          track_event("errors/#{ event_namespace }", errors: outcome.errors, inputs: inputs, current_user: current_user)
+          track_event("errors/#{ event_prefix }#{ event_namespace }", errors: outcome.errors, inputs: inputs, current_user: current_user)
           outcome
         end
       end

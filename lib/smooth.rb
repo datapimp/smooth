@@ -33,6 +33,8 @@ require "smooth/api"
 require "smooth/cache"
 require "smooth/command"
 require "smooth/example"
+require "smooth/response"
+
 require "smooth/query"
 require "smooth/resource"
 require "smooth/serializer"

@@ -183,25 +183,44 @@ class Smooth::Command < Mutations::Command
       filter_for_param(param).try(:options)
     end
 
-    def self.handle_request(request_object)
-      outcome = as(request_object.user).run(request_object.params)
-
-      if outcome.success?
-        [200, {}, find_serializer_for(request_object).serialize_object(outcome.result, serializer_options)]
-      else
-        [400, {}, outcome.errors.message]
-      end
+    def self.response_class
+      Smooth::Response
     end
 
-    def self.serializer_options
-      {}
+    # Creates a new instance of the Smooth::Command::Response
+    # class in response to a request from the Router.  It is
+    # assumed that a request object responds to: user, and params
+    def self.respond_to_request(request_object, options={})
+      klass = self
+
+      outcome = options.fetch(:outcome) do
+        klass.as(request_object.user).run(request_object.params)
+      end
+
+      response_class.new(outcome, serializer_options).tap do |response|
+        response.request_headers = request_object.headers
+        response.serializer = find_serializer_for(request_object)
+        response.event_namespace = event_namespace
+        response.command_action = command_action
+        response.current_user = request_object.user
+      end
     end
 
     def self.find_serializer_for(request_object)
       resource = Smooth.resource(resource_name)
       resource ||= Smooth.resource("#{ resource_name }".pluralize)
 
-      resource.fetch(:serializer, :default)
+      # TODO
+      # We can make the preferred format something you can
+      # specify via a header or parameter.  We can also restrict
+      # certain serializers from certain policies.
+      preferred_format = :default
+
+      resource.fetch(:serializer, preferred_format)
+    end
+
+    def self.serializer_options
+      {}
     end
 
     # Allows for defining common execution pattern methods
