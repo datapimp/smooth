@@ -37,6 +37,7 @@ require "smooth/query"
 require "smooth/resource"
 require "smooth/serializer"
 
+require "smooth/dsl_adapter"
 require "smooth/active_record/adapter"
 require "smooth/model_adapter"
 require "smooth/user_adapter"
@@ -48,7 +49,7 @@ module Smooth
   extend Smooth::Api::Tracking
   extend Smooth::Resource::Tracking
   extend Smooth::Event::Adapter
-  extend Smooth::Dsl
+  extend Smooth::DslAdapter
 
   def self.command
     config.command_class
@@ -113,7 +114,7 @@ module Smooth
     end
 
     class Engine < ::Rails::Engine
-      initializer 'smooth.load_resources', :before => :build_middleware_stack do |app|
+      initializer 'smooth.load_resources' do |app|
         %w{app/apis app/resources}.each do |check|
           if (folder = app.root.join(check)).exist?
             folder.children.select {|f| f.extname == '.rb'}.each do |f|
@@ -122,7 +123,7 @@ module Smooth
           end
         end
 
-        Smooth.eager_load_from_app_folders()
+        #Smooth.eager_load_from_app_folders()
       end
     end
   end

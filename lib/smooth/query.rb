@@ -115,5 +115,18 @@ module Smooth
       val
     end
 
+    def self.handle_request(request_object)
+      response    = as(request_object.user).run(request_object.params)
+      find_serializer_for(request_object).serialize_object(response, serializer_options)
+    end
+
+    def self.serializer_options
+      {}
+    end
+
+    def self.find_serializer_for(request_object)
+      Smooth.resource(resource_name).fetch(:serializer, :default)
+    end
+
   end
 end

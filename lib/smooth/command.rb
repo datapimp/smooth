@@ -117,7 +117,16 @@ class Smooth::Command < Mutations::Command
       return command_klass.tap(&apply_options)
     end
 
-    Object.const_set(klass, Class.new(base)).tap(&apply_options)
+    parent_klass = Class.new(base)
+
+    begin
+      Object.const_set(klass, parent_klass).tap(&apply_options)
+    rescue => ex
+      puts ex.message
+      puts "Error setting #{ klass } #{ base }. klass is a #{ klass.class }"
+    end
+
+    parent_klass
   end
 
   # Interface Documentation
@@ -174,5 +183,8 @@ class Smooth::Command < Mutations::Command
       filter_for_param(param).try(:options)
     end
 
+    def self.handle_request(request_object)
+      as(request_object.user).run(request_object.params)
+    end
 
 end

@@ -210,8 +210,17 @@ module Smooth
       config
     end
 
-    def routes &block
-      return @routes if !block_given?
+    def routes options={}, &block
+      return @router unless block_given?
+
+      @router ||= Smooth::Resource::Router.new(self, options).tap do |router|
+        router.instance_eval(&block)
+        router.build_methods_table()
+      end
+    end
+
+    def router
+      @router || routes()
     end
 
     def examples options={}, &block
@@ -283,3 +292,4 @@ module Smooth
 end
 
 require 'smooth/resource/tracking'
+require 'smooth/resource/router'

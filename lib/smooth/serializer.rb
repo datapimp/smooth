@@ -46,7 +46,16 @@ module Smooth
         return serializer_klass
       end
 
-      Object.const_set(klass, Class.new(base))
+      parent_klass = Class.new(base)
+
+      begin
+        Object.const_set(klass, parent_klass)
+      rescue => ex
+        puts ex.message
+        puts "Error setting #{ klass } #{ base }. klass is a #{ klass.class }"
+      end
+
+      parent_klass
     end
 
     def self.documentation_for_attribute attribute

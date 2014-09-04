@@ -1,8 +1,9 @@
-require 'smooth/dsl'
+require 'smooth/api/sinatra_adapter'
 
 module Smooth
   class Api
     include Smooth::Documentation
+    include Smooth::Api::SinatraAdapter
 
     def self.default
       @default ||= Smooth::Api.new(:default)
@@ -21,10 +22,33 @@ module Smooth
       @_policies    = {}
     end
 
+    def call(env)
+      sinatra.call(env)
+    end
+
     def as(current_user, &block)
       proxy = DslProxy.new(current_user, self)
       proxy.instance_eval(&block) if block_given?
       proxy
+    end
+
+    def lookup_current_user params, headers
+      auth_strategy, key = authentication_strategy
+
+      case
+        when auth_strategy == :param && parts = params[key]
+          id, passed_token = parts.split(':')
+          user_class.find_for_smooth_api_request(id, passed_token)
+        when auth_strategy == :header && parts = headers[key]
+          id, passed_token = parts.split(':')
+          user_class.find_for_smooth_api_request(id, passed_token)
+        else
+          user_class.anonymous_smooth_user(params, headers)
+      end
+    end
+
+    def lookup_policy params, headers
+      {}.to_mash
     end
 
     def lookup_object_by path
@@ -58,6 +82,30 @@ module Smooth
     def version config=nil
       @_version_config = config if config
       @_version_config
+    end
+
+    def user_class user_klass=nil, &block
+      @user_class = user_klass if user_klass.present?
+      @user_class || User
+      @user_class.class_eval(&block) if block_given?
+      @user_class
+    end
+
+    def authentication_strategy option=nil, key=nil
+      return @authentication_strategy || [:header, "X-AUTH-TOKEN"] if option.nil?
+
+      if !option.nil?
+        key = case
+              when key.present?
+                key
+              when option.to_sym == :param
+                :auth_token
+              when option.to_sym == :header
+                "X-AUTH-TOKEN"
+              end
+      end
+
+      @authentication_strategy = [option, key]
     end
 
     def policy policy_name, options={}, &block

@@ -1,12 +1,9 @@
 #!/usr/bin/env ruby
 
 $:.unshift File.join(File.dirname(__FILE__),'..','lib')
-$:.unshift File.join(File.dirname(__FILE__),'..','examples')
 
 require 'bundler'
 
 Bundler.require(:default, :development)
-
-require 'dsl_driven'
 
 Pry.start(self,{})

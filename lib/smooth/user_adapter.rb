@@ -1,5 +1,38 @@
 module Smooth
   module UserAdapter
+
+    def self.included(base)
+      base.extend(ClassMethods)
+      base.send(:attr_accessor,:last_request_params, :last_request_headers)
+    end
+
+    module ClassMethods
+      def find_for_smooth_api_request(id, passed_authentication_token)
+        where(id: id, authentication_token: passed_authentication_token).first
+      end
+
+      def anonymous_smooth_user params, headers
+        User.new.tap do |user|
+          user.last_request_params = params
+          user.last_request_headers = headers
+          user.making_anonymous_request = true
+        end
+      end
+    end
+
+    def making_anonymous_request= setting
+      @making_anonymous_request = !!(setting)
+    end
+
+    def anonymous?
+      !!(@making_anonymous_request)
+    end
+
+    def smooth_authentication_token
+      read_attribute(:authentication_token)
+      "#{ self.id }:#{ token }"
+    end
+
     # Allows for using the current_user making an API request
     # as the source of all queries, and commands run against
     # Smooth resources.

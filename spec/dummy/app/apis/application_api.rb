@@ -3,9 +3,14 @@ require 'smooth/dsl'
 api "My Application" do
   version :v1
 
+  authentication_strategy :header, "X-AUTH-TOKEN"
+
+  user_class User do
+    include(Smooth::UserAdapter)
+  end
+
   desc "Public users include anyone with access to the URL"
   policy :public_users do
-
     # commands / queries can be set to true or false to allow
     # all commands and queries defined for the books resource.
     #allow :books, :commands => false, :queries => true
