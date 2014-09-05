@@ -26,10 +26,27 @@ class Smooth::Command < Mutations::Command
                   :command_action,
                   :event_namespace,
                   :model_class,
-                  :base_scope
+                  :base_scope,
+                  :parent_resource
 
   def self.base_scope
     @base_scope || :all
+  end
+
+  def parent_api
+    self.class.parent_api
+  end
+
+  def parent_resource
+    self.class.parent_resource
+  end
+
+  def self.belongs_to_resource(resource)
+    self.parent_resource = resource
+  end
+
+  def self.parent_api
+    parent_resource.api
   end
 
   # Returns the model scope for this command.  If a scope method
@@ -105,6 +122,8 @@ class Smooth::Command < Mutations::Command
 
     apply_options = lambda do |k|
       k.model_class     ||= resource.model_class if resource.model_class
+
+      k.belongs_to_resource(resource)
 
       k.resource_name   = resource.name.to_s
       k.command_action  = options.name.to_s

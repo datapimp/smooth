@@ -8,6 +8,10 @@ describe "The Smooth Command" do
     expect(command.resource_name).to eq("Books")
   end
 
+  it "should reference the parent resource" do
+    expect(command.parent_resource).to equal(books)
+  end
+
   it "should know the command action" do
     expect(command.command_action).to eq("like")
   end

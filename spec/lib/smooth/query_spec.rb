@@ -3,6 +3,7 @@ require "spec_helper"
 describe "The Smooth Query" do
   let(:query) { BookQuery }
   let(:user) { User.where(email:"jon@chicago.com",role:"user").first_or_create }
+  let(:books) { Smooth("Books") }
 
   before(:each) do
     Book.delete_all
@@ -38,5 +39,13 @@ describe "The Smooth Query" do
     Smooth.events.on("query.book", bucket)
     query.as(user).run()
     expect(bucket).not_to be_empty
+  end
+
+  it "should belong to the book resource" do
+    expect(BookQuery.parent_resource).to equal(books)
+  end
+
+  it "should belong to the api" do
+    expect(query.parent_api).to eq(books.api)
   end
 end

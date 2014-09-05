@@ -48,6 +48,8 @@ module Smooth
 
       parent_klass = Class.new(base)
 
+      parent_klass.belongs_to_resource(resource)
+
       begin
         Object.const_set(klass, parent_klass)
       rescue => ex
@@ -56,6 +58,24 @@ module Smooth
       end
 
       parent_klass
+    end
+
+    class_attribute :parent_resource
+
+    def parent_resource
+      self.class.parent_resource
+    end
+
+    def parent_api
+      self.class.parent_api
+    end
+
+    def self.belongs_to_resource(resource)
+      self.parent_resource = resource
+    end
+
+    def self.parent_api
+      parent_resource.api
     end
 
     def self.documentation_for_attribute attribute

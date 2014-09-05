@@ -47,7 +47,9 @@ module Smooth
       model_class.arel_table
     end
 
-    class_attribute :query_config
+    class_attribute :query_config,
+                    :parent_resource
+
     self.query_config = Hashie::Mash.new(base:{})
 
     def self.configure dsl_config_object, resource=nil
@@ -75,6 +77,7 @@ module Smooth
 
         k.resource_name   = resource.name.to_s if k.resource_name.empty?
         k.command_action  = "query" if k.command_action.empty?
+        k.belongs_to_resource(resource)
       end
 
       if query_klass = Object.const_get(klass) rescue nil

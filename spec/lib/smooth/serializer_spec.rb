@@ -10,6 +10,15 @@ describe "The Smooth Serializer" do
 
   it "should relate to the book model" do
     expect(Book.active_model_serializer).to equal(serializer)
+    expect(serializer.model_class).to equal(Book)
+  end
+
+  it "should relate to the books resource" do
+    expect(serializer.parent_resource).to equal(books)
+  end
+
+  it "should relate to the api" do
+    expect(serializer.parent_api).to equal(books.api)
   end
 
   it "should have documentation for its attributes" do
@@ -23,4 +32,5 @@ describe "The Smooth Serializer" do
   it "should have documentation for its computed properties" do
     expect(serializer.documentation_for_attribute(:computed_property).description).not_to be_blank
   end
+
 end
