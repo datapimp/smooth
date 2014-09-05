@@ -14,6 +14,10 @@ module Smooth
         @rules = []
       end
 
+      def patterns
+        rules.flatten.compact.map {|r| r.fetch(:pattern) }
+      end
+
       def apply_to(sinatra)
         router = self
 

@@ -219,6 +219,14 @@ module Smooth
       end
     end
 
+    def model(&block)
+      model_class.instance_eval(&block)
+    end
+
+    def scope(*args, &block)
+      model_class.send(:scope, *args, &block)
+    end
+
     def router
       @router || routes()
     end
