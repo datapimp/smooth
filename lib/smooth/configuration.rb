@@ -1,6 +1,3 @@
-require 'singleton'
-require 'yaml'
-
 module Smooth
   class Configuration
     include Singleton

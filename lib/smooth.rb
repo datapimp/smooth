@@ -1,23 +1,26 @@
 $:.unshift File.dirname(__FILE__)
 
-load_active_dependencies = lambda do
+load_rails_dependencies = lambda do
   require 'active_support/core_ext'
   require 'active_support/notifications'
   require 'active_record'
 end
 
 load_dependencies = lambda do
-  require 'hashie'
   require 'active_model_serializers'
+  require 'hashie'
   require 'mutations'
   require 'logger'
+  require 'sinatra'
+  require 'singleton'
+  require 'yaml'
 end
 
 begin
   load_dependencies.call()
 
   unless defined?(::Rails)
-    load_active_dependencies.call()
+    load_rails_dependencies.call()
   end
 rescue LoadError
   require 'rubygems'
@@ -30,8 +33,15 @@ require "smooth/documentation"
 require "smooth/event"
 
 require "smooth/api"
+require 'smooth/api/policy'
+require 'smooth/api/tracking'
+
 require "smooth/cache"
+
+require 'smooth/ext/mutations'
+require 'smooth/command/instrumented'
 require "smooth/command"
+
 require "smooth/example"
 require "smooth/response"
 

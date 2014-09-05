@@ -1,6 +1,3 @@
-require 'smooth/ext/mutations'
-require 'smooth/command/instrumented'
-
 class Smooth::Command < Mutations::Command
   include Instrumented
 

@@ -1,9 +1,6 @@
-require 'smooth/api/sinatra_adapter'
-
 module Smooth
   class Api
     include Smooth::Documentation
-    include Smooth::Api::SinatraAdapter
 
     def self.default
       @default ||= Smooth::Api.new(:default)
@@ -24,6 +21,18 @@ module Smooth
 
     def call(env)
       sinatra.call(env)
+    end
+
+    def sinatra
+      app = @sinatra_application_klass ||= Class.new(Sinatra::Base)
+
+      @sinatra ||= begin
+                     _resources.each do |name, resource|
+                       resource.router.apply_to(app)
+                     end
+
+                     app
+                   end
     end
 
     def inspect
@@ -176,5 +185,3 @@ module Smooth
   end
 end
 
-require 'smooth/api/tracking'
-require 'smooth/api/policy'
