@@ -18,6 +18,10 @@ module Smooth
         rules.flatten.compact.map {|r| r.fetch(:pattern) }
       end
 
+      def uri_templates
+        rules.flatten.compact.map {|r| r.fetch(:template) }
+      end
+
       def apply_to(sinatra)
         router = self
 
@@ -114,7 +118,7 @@ module Smooth
         describe_route(request_method, route_pattern)
 
         rules << bucket[route_pattern] = [
-          options.merge(:name => name, :method => request_method, args: args, pattern: route_pattern),
+          options.merge(:name => name, :method => request_method, args: args, pattern: route_pattern, template: Smooth.util.uri_template(route_pattern)),
           block
         ]
       end

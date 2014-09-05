@@ -124,16 +124,6 @@ module Smooth
       super
     end
 
-    def self.serialize_object(object, options={})
-      options.reverse_merge!(serializer: self, each_serializer: self)
-
-      begin
-        wrapped = new(object)
-        wrapped.as_json(options)
-      rescue => e
-        binding.pry
-      end
-    end
   end
 
   class ArraySerializer < ActiveModel::ArraySerializer

@@ -14,6 +14,8 @@ load_dependencies = lambda do
   require 'sinatra'
   require 'singleton'
   require 'yaml'
+  require 'escape_utils'
+  require 'uri_template'
 end
 
 begin
@@ -29,6 +31,8 @@ end
 
 
 require "smooth/ext/core"
+require 'smooth/util'
+
 require "smooth/documentation"
 require "smooth/event"
 
@@ -73,6 +77,10 @@ module Smooth
 
   def self.serializer
     config.serializer_class
+  end
+
+  def self.util
+    Smooth::Util
   end
 
   def self.config &block
