@@ -231,6 +231,14 @@ module Smooth
       @router || routes()
     end
 
+    def route_table
+      router.route_table
+    end
+
+    def expand_routes(from_attributes={})
+      router.expand_routes(from_attributes)
+    end
+
     def examples options={}, &block
       if options.empty? && !block_given?
         return @examples

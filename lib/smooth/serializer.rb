@@ -8,6 +8,19 @@ module Smooth
     self.attribute_descriptions   = {}.to_mash
     self.relationship_descriptions = {}.to_mash
 
+    # WIP
+    # Need to determine how to access the serialized version
+    # as it exists in the context of the serializer instance
+    def expand_routes
+      expanded = parent_resource.expand_routes(object.to_hash)
+
+      unless slice.empty?
+        return expanded.send(:slice, *slice)
+      end
+
+      expanded
+    end
+
     def self.method_added method_name
       if documented = inline_description
         attribute_descriptions[method_name.to_sym] = documented

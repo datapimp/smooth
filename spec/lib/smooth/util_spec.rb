@@ -12,4 +12,11 @@ describe "The Smooth Utils" do
     expect(vars[:version]).to eq("v1")
     expect(vars[:resource_name]).to eq("books")
   end
+
+  it "should expand a uri template" do
+    template = Smooth.util.uri_template("/api/:version/:resource_name")
+    expanded = Smooth.util.expand_url_template(template, version: "v1", resource_name: "books")
+
+    expect(expanded).to eq("/api/v1/books")
+  end
 end

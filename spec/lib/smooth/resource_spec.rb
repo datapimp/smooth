@@ -25,8 +25,12 @@ describe "The Smooth Resource" do
     expect(books.name).to eq("Books")
   end
 
-  it "should know the route patterns" do
-    expect(books.router.patterns).not_to be_empty
+  it "should have a route table" do
+    expect(books.route_table).not_to be_empty
+  end
+
+  it "should expand the route table with actual values" do
+    expect(books.expand_routes(id:1).values).to include("/books/1/like", "/books/1")
   end
 
   it "should have an arbitrary defined command class" do

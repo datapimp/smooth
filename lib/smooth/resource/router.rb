@@ -14,6 +14,37 @@ module Smooth
         @rules = []
       end
 
+      def route_table
+        route_patterns_table.inject({}) do |memo, p|
+          route_name, details = p
+          memo[route_name] = details[:pattern]
+          memo
+        end
+      end
+
+      def expand_routes(from_attributes={})
+        route_patterns_table.inject({}) do |memo, p|
+          route_name, details = p
+          memo[route_name] = Smooth.util.expand_url_template(details[:template], from_attributes)
+          memo
+        end
+      end
+
+      def route_patterns_table
+        rules.flatten.compact.inject({}) do |memo, rule|
+          memo.tap do
+            name = rule[:name]
+            pattern = rule[:pattern]
+            template = rule[:template]
+
+            memo[name] = {
+              pattern: pattern,
+              template: template
+            }
+          end
+        end
+      end
+
       def patterns
         rules.flatten.compact.map {|r| r.fetch(:pattern) }
       end
