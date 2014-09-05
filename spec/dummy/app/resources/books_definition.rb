@@ -11,9 +11,13 @@ resource "Books" do
     has_one :author
 
     desc "Documentation for computed property"
-
     def computed_property
       object.created_at
+    end
+
+    desc "Another way for doing computed properties"
+    computed(:another_computed_property) do
+      object.created_at.to_i
     end
   end
 

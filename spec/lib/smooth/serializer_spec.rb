@@ -33,4 +33,14 @@ describe "The Smooth Serializer" do
     expect(serializer.documentation_for_attribute(:computed_property).description).not_to be_blank
   end
 
+  it "should have documentation for its computed properties" do
+    expect(serializer.documentation_for_attribute(:another_computed_property).description).not_to be_blank
+  end
+
+  it "should serialize the object properly" do
+    book = Book.create(title:"Serialize This Man")
+    serialized = serializer.new(book).as_json
+    expect(serialized[:book]).not_to be_empty
+    expect(serialized[:book][:another_computed_property]).not_to be_nil
+  end
 end

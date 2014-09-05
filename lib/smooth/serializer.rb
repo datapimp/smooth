@@ -117,6 +117,12 @@ module Smooth
       super
     end
 
+    def self.computed *args, &block
+      property_name = args.first
+      send(:define_method, property_name, &block)
+      send(:attribute, *args)
+    end
+
     def self.has_one attr, options={}
       documented = inline_description
 
