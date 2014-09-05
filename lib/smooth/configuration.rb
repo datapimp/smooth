@@ -14,7 +14,8 @@ module Smooth
                    :schema_file,
                    :migrations_path,
                    :root,
-                   :include_root_in_json
+                   :include_root_in_json,
+                   :auth_token_column
 
 
     @@query_class               = Smooth::Query
@@ -31,6 +32,7 @@ module Smooth
     @@schema_file               = 'db/schema.rb'
     @@migrations_path           = 'db/migrate'
     @@root                      = Dir.pwd()
+    @@auth_token_column         = :authentication_token
 
     def active_record
       return active_record_config if active_record_config.is_a?(Hash)

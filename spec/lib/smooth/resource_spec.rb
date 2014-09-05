@@ -4,12 +4,29 @@ describe "The Smooth Resource" do
   let(:api) { Smooth.current_api }
   let(:books) { api.resource("Books") }
 
+  it "should define scopes on its model" do
+    api.resource("Books") do
+      model do
+        scope :model_defined_scope, -> { where("id is whatup") }
+      end
+
+      scope :resource_defined_scope, -> { where("id is you know") }
+    end
+
+    expect(Book).to respond_to(:model_defined_scope)
+    expect(Book).to respond_to(:resource_defined_scope)
+  end
+
   it "should reference its parent api" do
     expect(books.api).to be_present
   end
 
   it "should have a name" do
     expect(books.name).to eq("Books")
+  end
+
+  it "should know the route patterns" do
+    expect(books.router.patterns).not_to be_empty
   end
 
   it "should have an arbitrary defined command class" do

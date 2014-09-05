@@ -4,6 +4,14 @@ module Smooth
     def self.included(base)
       base.extend(ClassMethods)
       base.send(:attr_accessor,:last_request_params, :last_request_headers)
+
+      base.send(:before_create, ->{ generate_token(Smooth.config.auth_token_column) })
+    end
+
+    def generate_token column
+      if self.class.column_names.include?(column.to_s)
+        write_attribute(column, SecureRandom.urlsafe_base64)
+      end
     end
 
     module ClassMethods
