@@ -24,9 +24,14 @@ begin
   unless defined?(::Rails)
     load_rails_dependencies.call()
   end
-rescue LoadError
+rescue
   require 'rubygems'
-  retry
+
+  load_dependencies.call()
+
+  unless defined?(::Rails)
+    load_rails_dependencies.call()
+  end
 end
 
 

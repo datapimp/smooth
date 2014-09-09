@@ -15,7 +15,7 @@ module Smooth
       end
 
       def route_table
-        route_patterns_table.inject({}) do |memo, p|
+        @route_table ||= route_patterns_table.inject({}) do |memo, p|
           route_name, details = p
           memo[route_name] = details[:pattern]
           memo
@@ -31,7 +31,9 @@ module Smooth
       end
 
       def route_patterns_table
-        rules.flatten.compact.inject({}) do |memo, rule|
+        return @route_patterns_table if @route_patterns_table
+
+        @route_patterns_table = rules.flatten.compact.inject({}) do |memo, rule|
           memo.tap do
             name = rule[:name]
             pattern = rule[:pattern]
@@ -39,7 +41,8 @@ module Smooth
 
             memo[name] = {
               pattern: pattern,
-              template: template
+              template: template,
+              variables: Array(template.variables)
             }
           end
         end

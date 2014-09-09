@@ -3,7 +3,8 @@ module Smooth
     include Smooth::Documentation
 
     class_attribute :attribute_descriptions,
-                    :relationship_descriptions
+                    :relationship_descriptions,
+                    :resource_route_variables
 
     self.attribute_descriptions   = {}.to_mash
     self.relationship_descriptions = {}.to_mash
@@ -11,14 +12,38 @@ module Smooth
     # WIP
     # Need to determine how to access the serialized version
     # as it exists in the context of the serializer instance
-    def expand_routes
-      expanded = parent_resource.expand_routes(object.to_hash)
+    def expand_routes(*slice)
+      expanded = parent_resource.expand_routes(route_variables)
 
       unless slice.empty?
-        return expanded.send(:slice, *slice)
+        expanded = expanded.send(:slice, *slice)
       end
 
-      expanded
+      expanded.transform_keys do |key|
+        "#{ key }_url"
+      end
+    end
+
+    def route_variables
+      serializer = self
+
+      self.class.route_variables.inject({}) do |memo, var|
+        value = case
+                when serializer.respond_to?(var)
+                  serializer.send(var)
+                when serializer.object.respond_to?(var)
+                  serializer.object.send(var)
+                else
+                  serializer.read_attribute_for_serialization(var)
+                end
+
+        memo[var] = value
+        memo
+      end
+    end
+
+    def self.route_variables
+      @resource_route_variables ||= parent_resource.router.route_patterns_table.map {|p| _, h = p; h[:variables] }.flatten.compact.uniq
     end
 
     def self.method_added method_name
