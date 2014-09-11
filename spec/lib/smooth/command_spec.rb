@@ -3,6 +3,7 @@ require "spec_helper"
 describe "The Smooth Command" do
   let(:books) { Smooth.current_api.resource("Books") }
   let(:command) { books.fetch(:command, :like) }
+  let(:create_command) { books.fetch(:command, :create) }
 
   it "should know the resource name" do
     expect(command.resource_name).to eq("Books")
@@ -34,6 +35,11 @@ describe "The Smooth Command" do
   describe "Interface Documentation" do
     it "should document the interface" do
       expect(command.interface_documentation).not_to be_empty
+    end
+
+    it "should allow me to supply faker templates for example data" do
+      example = create_command.interface_documentation.filters.title.example
+      expect(example).not_to be_nil
     end
 
     it "should allow for descriptions of the filters" do

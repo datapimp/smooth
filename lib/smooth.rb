@@ -98,7 +98,7 @@ module Smooth
     begin
       Faker.const_get(group).send(meth)
     rescue
-      Faker::Hacker.author
+      Faker::App.author
     end
   end
 

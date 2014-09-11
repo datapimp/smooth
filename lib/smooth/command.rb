@@ -171,11 +171,15 @@ class Smooth::Command < Mutations::Command
         type        = filter.class.name[/^Mutations::([a-zA-Z]*)Filter$/, 1].underscore
         options     = filter.options.merge(required: required)
 
-        memo[key] = {
+        value = memo[key] = {
           type: type,
           options: options.reject {|k,v| v.nil? },
           description: input_descriptions[key]
         }
+
+        if options[:faker]
+          value[:example] = Smooth.faker(options[:faker])
+        end
 
         memo
       end

@@ -50,13 +50,11 @@ module Smooth
 
       case
         when auth_strategy == :param && parts = params[key]
-          id, passed_token = parts.split(':')
-          user_class.find_for_smooth_api_request(id, passed_token)
+          user_class.find_for_token_authentication(parts)
         when auth_strategy == :header && parts = headers[key]
-          id, passed_token = parts.split(':')
-          user_class.find_for_smooth_api_request(id, passed_token)
+          user_class.find_for_token_authentication(parts)
         else
-          user_class.anonymous_smooth_user(params, headers)
+          user_class.anonymous(params, headers)
       end
     end
 

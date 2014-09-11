@@ -45,7 +45,7 @@ resource "Books" do
     scope :accessible_to
 
     params do
-      string :title
+      string :title, faker: 'app.author'
     end
   end
 
@@ -102,6 +102,14 @@ resource "Books" do
 
     desc "Like a book"
     put "/books/:id/like", :to => :like
+  end
+
+  template do
+    title { Smooth.faker('app.author') }
+  end
+
+  template :ancient, class: Book do
+    year_published { 1776 }
   end
 
   examples :client => :rest do
