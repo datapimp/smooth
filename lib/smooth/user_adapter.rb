@@ -19,10 +19,15 @@ module Smooth
         where(id: id, authentication_token: passed_authentication_token).first
       end
 
-      def anonymous_smooth_user params, headers
+      def find_for_token_authentication(passed_authentication_token)
+        id, token = passed_authentication_token.split(':')
+        find_for_smooth_api_request(id, token)
+      end
+
+      def anonymous params=nil, headers=nil
         User.new.tap do |user|
-          user.last_request_params = params
-          user.last_request_headers = headers
+          user.last_request_params = params if params
+          user.last_request_headers = headers if headers
           user.making_anonymous_request = true
         end
       end

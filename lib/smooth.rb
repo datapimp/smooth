@@ -84,6 +84,24 @@ module Smooth
     config.serializer_class
   end
 
+  def self.fakers
+    @fakers ||= Smooth::Resource::Templating.fakers
+  end
+
+  def self.faker token
+    group, meth = token.split(".")
+
+    raise 'Invalid faker type. See Smooth.fakers' unless fakers.include?(token)
+
+    group = group.camelize.to_sym
+
+    begin
+      Faker.const_get(group).send(meth)
+    rescue
+      Faker::Hacker.author
+    end
+  end
+
   def self.util
     Smooth::Util
   end

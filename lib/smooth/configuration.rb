@@ -15,7 +15,8 @@ module Smooth
                    :migrations_path,
                    :root,
                    :include_root_in_json,
-                   :auth_token_column
+                   :auth_token_column,
+                   :enable_factories
 
 
     @@query_class               = Smooth::Query
@@ -27,6 +28,7 @@ module Smooth
     @@object_path_separator     = '.'
     @@definition_folders        = %w{app/models app/apis app/queries app/commands app/serializers app/resources }
     @@include_root_in_json      = true
+    @@enable_factories          = true
 
     @@active_record_config      = 'config/database.yml'
     @@schema_file               = 'db/schema.rb'

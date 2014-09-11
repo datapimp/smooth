@@ -1,6 +1,9 @@
+require 'smooth/resource/templating'
+
 module Smooth
   class Resource
     include Smooth::Documentation
+    include Smooth::Resource::Templating
 
     attr_accessor :resource_name,
                   :api_name,
@@ -304,6 +307,7 @@ module Smooth
     def configure_examples
       @examples = {}
     end
+
   end
 end
 
