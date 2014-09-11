@@ -105,7 +105,7 @@ resource "Books" do
   end
 
   template do
-    title { Smooth.faker('app.author') }
+    title { Smooth.faker('company.catch_phrase') }
   end
 
   template :ancient, class: Book do

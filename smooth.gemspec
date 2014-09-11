@@ -22,7 +22,7 @@ Gem::Specification.new do |spec|
   spec.add_dependency 'activesupport', '>= 4.0.0'
   spec.add_dependency 'activerecord', '>= 4.0.0'
   spec.add_dependency 'active_model_serializers', '~> 0.8.0'
-  spec.add_dependency 'faker'
+  spec.add_dependency 'ffaker'
   spec.add_dependency 'factory_girl'
   spec.add_dependency 'mutations'
   spec.add_dependency 'sinatra'

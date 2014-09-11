@@ -2,16 +2,19 @@ module Smooth
   class Resource
     module Templating
 
-      def self.included base
-        require 'factory_girl' unless defined?(::FactoryGirl)
-        require 'faker' unless defined?(::Faker)
-      end
+      FakerGroups = %w{
+        Address Lorem Color Company Food HipterIpsum Internet Job Name Movie PhoneNumber Product Unit Vehicle Venue Skill
+      }
 
       def self.fakers
-        (Faker.constants - [:Config,:Base,:VERSION]).flat_map do |group|
-          prefix = group.to_s.downcase
-          (Faker.const_get(group).methods - Object.methods - Faker::Base.methods).map {|m| "#{prefix}.#{m}" }
-        end
+        FakerGroups.flat_map do |group|
+          prefix = group.to_s.underscore.downcase
+          space = Faker.const_get(group.to_sym) rescue nil
+
+          if space && space.class == Module
+            (space.methods - Object.methods - [:k, :underscore]).map {|m| "#{prefix}.#{m}"}
+          end
+        end.compact.uniq
       end
 
       def create_from_template(name=nil, *args, &block)

@@ -16,6 +16,8 @@ load_dependencies = lambda do
   require 'yaml'
   require 'escape_utils'
   require 'uri_template'
+  require 'ffaker'
+  require 'factory_girl'
 end
 
 begin
@@ -91,14 +93,12 @@ module Smooth
   def self.faker token
     group, meth = token.split(".")
 
-    raise 'Invalid faker type. See Smooth.fakers' unless fakers.include?(token)
-
     group = group.camelize.to_sym
 
     begin
       Faker.const_get(group).send(meth)
     rescue
-      Faker::App.author
+      Faker::Company.catch_phrase
     end
   end
 
