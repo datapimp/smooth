@@ -4,15 +4,15 @@ module Smooth
     def api name, *args, &block
       Smooth.current_api_name = name
 
+      config_block = block_given?
+
       instance = Smooth.fetch_api(name) do |key|
         options = args.dup.extract_options!
 
-        Smooth::Api.new(name, options).tap do |obj|
-          obj.instance_eval(&block) if block_given?
-        end
+        Smooth::Api.new(name, options)
       end
 
-      instance
+      instance.tap {|obj| obj.instance_eval(&block) if config_block }
     end
 
     # Creates or opens a resource definition

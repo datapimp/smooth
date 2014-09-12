@@ -77,7 +77,7 @@ module Smooth
                 args: args
               }
             rescue => exception
-              halt 500, {}, { error: exception.message, stage: "request" }.to_json
+              halt 500, {}, { error: exception.message, backtrace: exception.backtrace, stage: "request" }.to_json
             end
 
             begin
