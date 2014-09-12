@@ -28,7 +28,7 @@ module Smooth
 
       @sinatra ||= begin
                      _resources.each do |name, resource|
-                       resource.router.apply_to(app)
+                       resource.router && resource.router.apply_to(app)
                      end
 
                      app

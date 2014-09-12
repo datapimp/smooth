@@ -16,4 +16,8 @@ describe "Resource Object Templates" do
   it "should let me define custom templates" do
     expect(books.build_from_template(:ancient).year_published).to eq(1776)
   end
+
+  it "should know if a template has been registered" do
+    expect(books.template_registered?).to eq(true)
+  end
 end

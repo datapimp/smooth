@@ -90,16 +90,19 @@ module Smooth
     @fakers ||= Smooth::Resource::Templating.fakers
   end
 
-  def self.faker token
+  def self.faker token, force_string=true
     group, meth = token.split(".")
 
     group = group.camelize.to_sym
 
-    begin
+    value = begin
       Faker.const_get(group).send(meth)
     rescue
       Faker::Company.catch_phrase
     end
+
+    value = value.join("\n") if value.is_a?(Array) && force_string
+    value
   end
 
   def self.util

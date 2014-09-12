@@ -44,9 +44,16 @@ module Smooth
 
         options[:class] ||= model_class
 
+        resource = self
+
         FactoryGirl.define do
-          factory(name, options, &block)
+          factory(name, options, &block) unless resource.template_registered?(name)
         end
+      end
+
+      def template_registered? name=nil
+        name ||= model_class.table_name.singularize.to_sym
+        !!(FactoryGirl.factory_by_name(name) rescue nil)
       end
 
       # Just allows us to wrap template definitions
