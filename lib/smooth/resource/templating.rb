@@ -44,10 +44,8 @@ module Smooth
 
         options[:class] ||= model_class
 
-        resource = self
-
         FactoryGirl.define do
-          factory(name, options, &block) unless resource.template_registered?(name)
+          factory(name.to_sym, options, &block)
         end
       end
 
