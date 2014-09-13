@@ -26,13 +26,15 @@ module Smooth
     def sinatra
       app = @sinatra_application_klass ||= Class.new(Sinatra::Base)
 
-      @sinatra ||= begin
-                     _resources.each do |name, resource|
-                       resource.router && resource.router.apply_to(app)
-                     end
+      @sinatra ||=  begin
+                      _resources.each do |name, resource|
+                        resource.router && resource.router.apply_to(app)
+                      end
 
-                     app
-                   end
+                      expose_interface_documentation_via(app)
+
+                      app
+                    end
     end
 
     def inspect
@@ -82,11 +84,32 @@ module Smooth
       _resources.keys
     end
 
+    def documentation_base
+      {
+        api_meta: {
+          resource_names: resource_names
+        }
+      }
+    end
+
     def interface_documentation
-      resource_names.inject({}) do |memo, resource_name|
+      resource_names.inject(documentation_base) do |memo, resource_name|
         memo.tap do
           memo[resource_name.to_s] = resource(resource_name).interface_documentation
         end
+      end
+    end
+
+    def expose_interface_documentation_via(sinatra)
+      api = self
+
+      sinatra.send :get, "/interface" do
+        api.interface_documentation.to_json
+      end
+
+      sinatra.send :get, "/interface/:resource_name" do
+        docs = api.interface_documentation[params[:resource_name]]
+        docs.to_json
       end
     end
 
