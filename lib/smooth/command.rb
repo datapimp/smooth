@@ -94,7 +94,12 @@ class Smooth::Command < Mutations::Command
     value
   end
 
+  def self.object_path
+    resource_name.downcase + "." + command_action
+  end
+
   def event_namespace; self.class.event_namespace; end
+  def object_path; self.class.object_path; end
   def resource_name; self.class.resource_name; end
   def resource_alias; self.class.resource_alias; end
   def model_class; self.class.model_class; end

@@ -89,19 +89,19 @@ resource "Books" do
   # under /api/v1/books, /api/v1/books/1 etc
   routes do
     desc "List all books"
-    get "/books", :to => :query
+    get "/books", :to => :query, :as => :list_books
 
     desc "Show an individual book"
-    show "/books/:id", :to => :show
+    show "/books/:id", :to => :show, :as => :show_book
 
     desc "Create a new book"
-    post "/books", :to => :create
+    post "/books", :to => :create, :as => :create_book
 
     desc "Update an existing book"
-    put "/books/:id", :to => :update
+    put "/books/:id", :to => :update, :as => :update_book
 
     desc "Like a book"
-    put "/books/:id/like", :to => :like
+    put "/books/:id/like", :to => :like, :as => :like_book
   end
 
   template do

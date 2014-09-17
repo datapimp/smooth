@@ -25,6 +25,10 @@ describe "The Smooth Command" do
     expect(command.model_class).to equal(Book)
   end
 
+  it "should know its object path" do
+    expect(books.api.lookup(command.object_path)).to eq(LikeBook)
+  end
+
   describe "Execution Patterns" do
     it "should follow common execution patterns if specified" do
       cmd = books.fetch(:command, :update)

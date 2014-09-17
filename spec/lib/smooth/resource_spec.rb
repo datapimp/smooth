@@ -4,6 +4,9 @@ describe "The Smooth Resource" do
   let(:api) { Smooth.current_api }
   let(:books) { api.resource("Books") }
 
+  it "should do" do
+  end
+
   it "should define scopes on its model" do
     api.resource("Books") do
       model do
