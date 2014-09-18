@@ -2,18 +2,33 @@ module Smooth
   class Query < Smooth::Command
     include Smooth::Documentation
 
+    # To customize the filtering behavior of the query
+    # you can supply your own execute method body. The
+    # execute method is expected to mutate the value of the
+    # `self.scope` or @scope instance variable and to return
+    # something which can be serialized as JSON using the
+    # Smooth::Serializer
     def execute
-      respond
+      apply_filters
       scope
+    end
+
+    def apply_filters
+      params.each(&method(:apply_filter))
+
+      if raw_inputs['ids']
+        ids = raw_inputs['ids']
+        ids = ids.split(',') if ids.is_a?(String)
+
+        self.scope = self.scope.where(id: Array(ids) )
+      end
     end
 
     def validate
       true
     end
 
-    def respond
-      params.each(&method(:apply_filter))
-    end
+    protected
 
     def operator_for filter
       specific = interface_for(filter).options.operator
@@ -35,6 +50,9 @@ module Smooth
       operator = operator_for(key)
 
       value = "%#{value}%" if operator == :like
+      value = "#{value}%" if operator == :ends_with
+      value = "%#{value}" if operator == :begins_with
+
       operator = :matches if operator == :like
 
       column = column_for(key)

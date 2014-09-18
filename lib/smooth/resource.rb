@@ -284,9 +284,12 @@ module Smooth
       resource = self
 
       @serializers = _serializers.inject({}.to_mash) do |memo, p|
-        ref, cfg = p
-        memo[cfg.name.downcase] = Smooth::Serializer.configure(cfg, resource)
-        memo
+        memo.tap do
+          ref, cfg = p
+          serializer = memo[cfg.name.downcase] = Smooth::Serializer.configure(cfg, resource)
+
+          serializer.return_ids_for_relationships! if Smooth.config.embed_relationships_as == :ids
+        end
       end
     end
 

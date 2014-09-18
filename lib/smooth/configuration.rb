@@ -18,7 +18,8 @@ module Smooth
                    :auth_token_column,
                    :enable_factories,
                    :async_provider,
-                   :memory_store
+                   :memory_store,
+                   :embed_relationships_as
 
 
     @@query_class               = Smooth::Query
@@ -39,6 +40,8 @@ module Smooth
     @@auth_token_column         = :authentication_token
     @@async_provider            = Sidekiq::Worker if defined?(Sidekiq)
     @@memory_store              = Smooth.cache
+
+    @@embed_relationships_as    = :ids
 
     def active_record
       return active_record_config if active_record_config.is_a?(Hash)

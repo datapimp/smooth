@@ -38,7 +38,7 @@ describe "The Books Resource Routes" do
     book = json.fetch("book")
 
     expect(response.status).to eq(200)
-    expect(book).to have_key("author")
+    expect(book).to have_key("author_id")
     expect(book["id"]).not_to be_nil
     expect(book["title"]).to eq("The Biography of Jon Soeder")
   end

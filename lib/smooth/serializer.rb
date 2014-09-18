@@ -2,6 +2,7 @@ module Smooth
   class Serializer < ActiveModel::Serializer
     include Smooth::Documentation
 
+
     class_attribute :attribute_descriptions,
                     :relationship_descriptions,
                     :resource_route_variables
@@ -166,6 +167,15 @@ module Smooth
       end
 
       super
+    end
+
+    def self.return_ids_for_relationships!
+      @returns_ids_for_relationships = true
+      embed :ids
+    end
+
+    def self.returns_ids_for_relationships?
+      @returns_ids_for_relationships == true
     end
 
   end

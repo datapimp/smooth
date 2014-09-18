@@ -14,10 +14,6 @@ describe "The Smooth Query" do
     expect(BookQuery.new.inline_dsl_method).to eq(true)
   end
 
-  it "should be able to lookup what column to filter" do
-    expect(BookQuery.new.column_for(:title)).to eq(:title)
-  end
-
   it "should return some books" do
     Book.where(title:"Animal Farm").first_or_create()
     expect(query.run(title: "Animal Farm").result.count).to eq(1)
