@@ -23,3 +23,5 @@ spec/dummy/db/*.sqlite3
 .vimrc
 test-examples/
 front-end/
+node_modules/
+bower_components/

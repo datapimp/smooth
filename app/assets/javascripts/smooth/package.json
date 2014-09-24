@@ -1,0 +1,33 @@
+{
+  "name": "smooth-io",
+  "version": "0.0.1",
+  "description": "\"The JS Environment for the Architects App\"",
+  "main": "entry.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "author": "",
+  "license": "ISC",
+  "engine": {
+    "node": "0.10.x",
+    "npm": "1.3.x"
+  },
+  "dependencies": {
+    "webpack": "^1.4.0-beta4",
+    "coffee-loader": "latest",
+    "cjsx-loader": "latest",
+    "backbone": "latest",
+    "underscore": "latest",
+    "underscore.string": "latest",
+    "url-template": "latest",
+    "inflection": "latest",
+    "bower": "latest",
+    "react": "latest",
+    "backbone-react-component": "latest",
+    "react-treeview": "latest",
+    "react-draggable": "latest",
+    "react-router": "latest"
+
+  }
+}
+
