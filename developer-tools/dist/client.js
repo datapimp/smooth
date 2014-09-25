@@ -44,7 +44,7 @@ return /******/ (function(modules) { // webpackBootstrap
 /******/ 	__webpack_require__.c = installedModules;
 /******/
 /******/ 	// __webpack_public_path__
-/******/ 	__webpack_require__.p = "dist";
+/******/ 	__webpack_require__.p = "";
 /******/
 /******/ 	// Load entry module and return exports
 /******/ 	return __webpack_require__(0);
@@ -56,7 +56,7 @@ return /******/ (function(modules) { // webpackBootstrap
 
 	var $, Smooth, _;
 
-	_ = __webpack_require__(11);
+	_ = __webpack_require__(12);
 
 	$ = __webpack_require__(1);
 
@@ -94,13 +94,13 @@ return /******/ (function(modules) { // webpackBootstrap
 
 	var util, _;
 
-	_ = __webpack_require__(11);
+	_ = __webpack_require__(12);
 
 	module.exports = util = {};
 
 	_.extend(util, {
-	  inflections: __webpack_require__(29),
-	  string: __webpack_require__(30)
+	  inflections: __webpack_require__(30),
+	  string: __webpack_require__(31)
 	});
 
 	util.chunk = function(data, size) {
@@ -144,11 +144,11 @@ return /******/ (function(modules) { // webpackBootstrap
 
 	var Backbone, Model, util, _;
 
-	_ = __webpack_require__(11);
+	_ = __webpack_require__(12);
 
 	util = __webpack_require__(2);
 
-	Backbone = __webpack_require__(10);
+	Backbone = __webpack_require__(11);
 
 	module.exports = Model = Backbone.Model.extend({
 	  read: function(attr) {
@@ -167,11 +167,11 @@ return /******/ (function(modules) { // webpackBootstrap
 
 	var Backbone, Collection, util, _;
 
-	_ = __webpack_require__(11);
+	_ = __webpack_require__(12);
 
 	util = __webpack_require__(2);
 
-	Backbone = __webpack_require__(10);
+	Backbone = __webpack_require__(11);
 
 	module.exports = Collection = Backbone.Collection.extend({
 	  initialize: function(models, options) {
@@ -201,7 +201,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	  __hasProp = {}.hasOwnProperty,
 	  __extends = function(child, parent) { for (var key in parent) { if (__hasProp.call(parent, key)) child[key] = parent[key]; } function ctor() { this.constructor = child; } ctor.prototype = parent.prototype; child.prototype = new ctor(); child.__super__ = parent.prototype; return child; };
 
-	_ = __webpack_require__(11);
+	_ = __webpack_require__(12);
 
 	util = __webpack_require__(2);
 
@@ -400,7 +400,8 @@ return /******/ (function(modules) { // webpackBootstrap
 /* 7 */,
 /* 8 */,
 /* 9 */,
-/* 10 */
+/* 10 */,
+/* 11 */
 /***/ function(module, exports, __webpack_require__) {
 
 	var __WEBPACK_AMD_DEFINE_ARRAY__, __WEBPACK_AMD_DEFINE_RESULT__;//     Backbone.js 1.1.2
@@ -414,7 +415,7 @@ return /******/ (function(modules) { // webpackBootstrap
 
 	  // Set up Backbone appropriately for the environment. Start with AMD.
 	  if (true) {
-	    !(__WEBPACK_AMD_DEFINE_ARRAY__ = [__webpack_require__(11), __webpack_require__(1), exports], __WEBPACK_AMD_DEFINE_RESULT__ = function(_, $, exports) {
+	    !(__WEBPACK_AMD_DEFINE_ARRAY__ = [__webpack_require__(12), __webpack_require__(1), exports], __WEBPACK_AMD_DEFINE_RESULT__ = function(_, $, exports) {
 	      // Export global even in AMD case in case this script is loaded with
 	      // others that may still expect a global Backbone.
 	      root.Backbone = factory(root, exports, _, $);
@@ -2014,7 +2015,7 @@ return /******/ (function(modules) { // webpackBootstrap
 
 
 /***/ },
-/* 11 */
+/* 12 */
 /***/ function(module, exports, __webpack_require__) {
 
 	var __WEBPACK_AMD_DEFINE_ARRAY__, __WEBPACK_AMD_DEFINE_RESULT__;//     Underscore.js 1.7.0
@@ -3435,7 +3436,6 @@ return /******/ (function(modules) { // webpackBootstrap
 
 
 /***/ },
-/* 12 */,
 /* 13 */,
 /* 14 */,
 /* 15 */,
@@ -3452,7 +3452,8 @@ return /******/ (function(modules) { // webpackBootstrap
 /* 26 */,
 /* 27 */,
 /* 28 */,
-/* 29 */
+/* 29 */,
+/* 30 */
 /***/ function(module, exports, __webpack_require__) {
 
 	var __WEBPACK_AMD_DEFINE_FACTORY__, __WEBPACK_AMD_DEFINE_ARRAY__, __WEBPACK_AMD_DEFINE_RESULT__;/*!
@@ -4458,7 +4459,7 @@ return /******/ (function(modules) { // webpackBootstrap
 
 
 /***/ },
-/* 30 */
+/* 31 */
 /***/ function(module, exports, __webpack_require__) {
 
 	var __WEBPACK_AMD_DEFINE_ARRAY__, __WEBPACK_AMD_DEFINE_RESULT__;//  Underscore.string

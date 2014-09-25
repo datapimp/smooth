@@ -17,7 +17,7 @@ module.exports = {
     filename: "[name].js",
     library: ["Smooth","[name]"],
     libraryTarget: "umd",
-    publicPath: "dist"
+    publicPath: ""
   },
 
   resolve: {
@@ -50,8 +50,8 @@ module.exports = {
       { test: /\.cjsx$/, loaders: ["coffee-loader","cjsx-loader"] },
       { test: /\.scss$/, loader: "style!css!sass?outputStyle=expanded"},
       { test: /\.css$/, loader: "style!css!sass?outputStyle=expanded"},
-      {test: /\.(jpg|png|gif|svg)/, loader: 'file-loader?prefix=img/'},
-      {test: /\.(eot|ttf|woff)/, loader: 'file-loader?prefix=font/'}
+      {test: /\.(jpg|png|gif|svg)/, loader: 'file-loader?path=smooth-developer-tools'},
+      {test: /\.(eot|ttf|woff)/, loader: 'file-loader?path=smooth-developer-tools'}
     ]
   }
 };

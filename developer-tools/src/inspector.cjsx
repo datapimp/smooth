@@ -1,6 +1,6 @@
+require("semantic/build/packaged/javascript/semantic.js")
 require("semantic/build/packaged/css/semantic.css")
 require("./styles/index.scss")
-require("semantic/build/packaged/javascript/semantic")
 
 React         = require("react")
 Backbone      = require("backbone"); require("backbone-react-component")
@@ -11,8 +11,9 @@ Link          = Router.Link
 Locations     = Router.Locations
 Location      = Router.Location
 
-Sidebar       = require("./inspector/views/sidebar")
-IndexPage     = require("./inspector/pages/index")
+Sidebar           = require("./inspector/views/sidebar")
+IndexPage         = require("./inspector/pages/index")
+ApisIndexPage     = require("./inspector/pages/apis")
 
 Application = React.createClass
   onBeforeNavigation: ->
@@ -27,7 +28,8 @@ Application = React.createClass
       <div className="ui page grid">
         <div className="column">
           <Locations onBeforeNavigation={@onBeforeNavigation} onNavigation={@onNavigation}>
-            <Location path="/smooth/interface" handler={IndexPage} />
+            <Location path="/smooth-developer-tools" handler={IndexPage} />
+            <Location path="/smooth-developer-tools/apis" handler={ApisIndexPage} />
           </Locations>
         </div>
       </div>

@@ -158,6 +158,10 @@ module Smooth
     Pathname(File.dirname(__FILE__))
   end
 
+  def self.developer_tools_root
+    gem_root.join("..","developer-tools")
+  end
+
   if defined?(::Rails)
     def self.root
       ::Rails.root
@@ -166,19 +170,34 @@ module Smooth
     class Middleware
       def initialize(app,options={})
         @app = app
-        @static = Rack::Static.new(app, root: Smooth.gem_root.join("..","developer-tools"),
-                                        index:"index.html",
-                                        urls: {
-                                          "/smooth/interface" => "index.html",
-                                          "/smooth/interface/dist/inspector.js" => "dist/inspector.js",
-                                          "/smooth/interface/dist/client.js" => "dist/client.js"
-                                        }
-                                  )
+        @dist = Smooth.developer_tools_root.join("dist")
+        @static = Rack::Directory.new(@dist)
       end
 
       def call(env)
-        if env['PATH_INFO'].match(/\/smooth\/interface/)
-          #env['PATH_INFO'] = env['PATH_INFO'].gsub(/\/smooth\/interface/,'')
+        path = env['PATH_INFO']
+
+        if path.match(/smooth-developer-tools/)
+
+          if path == '/smooth-developer-tools'
+            env['PATH_INFO'] = "/index.html"
+          end
+
+          env['PATH_INFO'].gsub!('/smooth-developer-tools/','/')
+
+          path = env['PATH_INFO']
+          path_exists = @dist.join("#{ path }".gsub(/^\//,'')).exist?
+
+          if path == "/"
+            path = "/index.html"
+          elsif path.match(/\.\w+/)
+
+          elsif !path_exists
+            path = "/index.html"
+          end
+
+          env['PATH_INFO'] = path
+
           @static.call(env)
         else
           @app.call(env)
@@ -189,9 +208,7 @@ module Smooth
     class Engine < ::Rails::Engine
       initializer 'smooth.load_resources' do |app|
 
-        gem_root = Smooth.gem_root
-
-        app.middleware.use Middleware, root: gem_root
+        app.middleware.use Middleware, my_option: 1
 
         %w{app/apis app/resources}.each do |check|
           if (folder = app.root.join(check)).exist?
