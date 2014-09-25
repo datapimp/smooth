@@ -9,18 +9,19 @@ module.exports = {
 
   entry: {
     client: "./src/client.coffee",
-    inspector: "./src/inspector.coffee"
+    inspector: "./src/inspector.cjsx"
   },
 
   output: {
-    path: __dirname,
+    path: __dirname + "/dist",
     filename: "[name].js",
     library: ["Smooth","[name]"],
-    libraryTarget: "umd" 
+    libraryTarget: "umd",
+    publicPath: "dist"
   },
 
   resolve: {
-    extensions: ["",".js",".coffee",".cjsx"],
+    extensions: ["",".js",".coffee",".cjsx",".scss",".html"],
     modulesDirectories: [
       'node_modules', 
       'bower_components'
@@ -31,7 +32,8 @@ module.exports = {
     new webpack.ProvidePlugin({
       "_": "underscore",
       "Backbone": "backbone",
-      "React": "react"
+      "React": "react",
+      "Backbone.React.Component": "backbone-react-component"
     }) 
   ],
 
@@ -45,7 +47,11 @@ module.exports = {
   module: {
     loaders: [
       { test: /\.coffee$/, loaders: ["coffee-loader"] },
-      { test: /\.cjsx$/, loaders: ["coffee-loader","cjsx-loader"] }
+      { test: /\.cjsx$/, loaders: ["coffee-loader","cjsx-loader"] },
+      { test: /\.scss$/, loader: "style!css!sass?outputStyle=expanded"},
+      { test: /\.css$/, loader: "style!css!sass?outputStyle=expanded"},
+      {test: /\.(jpg|png|gif|svg)/, loader: 'file-loader?prefix=img/'},
+      {test: /\.(eot|ttf|woff)/, loader: 'file-loader?prefix=font/'}
     ]
   }
 };

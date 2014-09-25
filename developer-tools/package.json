@@ -14,8 +14,13 @@
   },
   "dependencies": {
     "webpack": "^1.4.0-beta4",
+    "webpack-dev-server": "latest",
     "coffee-loader": "latest",
     "cjsx-loader": "latest",
+    "sass-loader": "latest",
+    "style-loader": "latest",
+    "css-loader": "latest",
+    "file-loader": "latest",
     "backbone": "latest",
     "underscore": "latest",
     "underscore.string": "latest",
@@ -26,8 +31,7 @@
     "backbone-react-component": "latest",
     "react-treeview": "latest",
     "react-draggable": "latest",
-    "react-router": "latest"
-
+    "react-router-component": "latest"
   }
 }
 

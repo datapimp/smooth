@@ -154,13 +154,45 @@ module Smooth
     ENV['SMOOTH_ENV'] || ENV['RACK_ENV'] || ENV['RAILS_ENV'] || "development"
   end
 
+  def self.gem_root
+    Pathname(File.dirname(__FILE__))
+  end
+
   if defined?(::Rails)
     def self.root
       ::Rails.root
     end
 
+    class Middleware
+      def initialize(app,options={})
+        @app = app
+        @static = Rack::Static.new(app, root: Smooth.gem_root.join("..","developer-tools"),
+                                        index:"index.html",
+                                        urls: {
+                                          "/smooth/interface" => "index.html",
+                                          "/smooth/interface/dist/inspector.js" => "dist/inspector.js",
+                                          "/smooth/interface/dist/client.js" => "dist/client.js"
+                                        }
+                                  )
+      end
+
+      def call(env)
+        if env['PATH_INFO'].match(/\/smooth\/interface/)
+          #env['PATH_INFO'] = env['PATH_INFO'].gsub(/\/smooth\/interface/,'')
+          @static.call(env)
+        else
+          @app.call(env)
+        end
+      end
+    end
+
     class Engine < ::Rails::Engine
       initializer 'smooth.load_resources' do |app|
+
+        gem_root = Smooth.gem_root
+
+        app.middleware.use Middleware, root: gem_root
+
         %w{app/apis app/resources}.each do |check|
           if (folder = app.root.join(check)).exist?
             folder.children.select {|f| f.extname == '.rb'}.each do |f|
@@ -168,7 +200,6 @@ module Smooth
             end
           end
         end
-
         #Smooth.eager_load_from_app_folders()
       end
     end
