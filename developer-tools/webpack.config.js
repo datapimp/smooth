@@ -17,7 +17,7 @@ module.exports = {
     filename: "[name].js",
     library: ["Smooth","[name]"],
     libraryTarget: "umd",
-    publicPath: ""
+    publicPath: "/smooth-developer-tools/"
   },
 
   resolve: {
