@@ -22,3 +22,27 @@ util.resolve = (string, root)->
 
 util.read = (value)->
   if _.isFunction(value) then value() else value
+
+util.wordsForNumber = (number)->
+  number = 0 if number is 0
+  number = number - 1 if number > 1
+
+  [
+    "one"
+    "two"
+    "three"
+    "four"
+    "five"
+    "six"
+    "seven"
+    "eight"
+    "nine"
+    "ten"
+    "eleven"
+    "twelve"
+    "thirteen"
+    "fourteen"
+    "fifteen"
+    "sixteen"
+    "seventeen"
+  ][number]

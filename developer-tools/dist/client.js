@@ -50,13 +50,14 @@ return /******/ (function(modules) { // webpackBootstrap
 /******/ 	return __webpack_require__(0);
 /******/ })
 /************************************************************************/
-/******/ ([
-/* 0 */
+/******/ ({
+
+/***/ 0:
 /***/ function(module, exports, __webpack_require__) {
 
 	var $, Smooth, _;
 
-	_ = __webpack_require__(9);
+	_ = __webpack_require__(11);
 
 	$ = __webpack_require__(1);
 
@@ -83,24 +84,26 @@ return /******/ (function(modules) { // webpackBootstrap
 
 
 /***/ },
-/* 1 */
+
+/***/ 1:
 /***/ function(module, exports, __webpack_require__) {
 
 	module.exports = jQuery;
 
 /***/ },
-/* 2 */
+
+/***/ 2:
 /***/ function(module, exports, __webpack_require__) {
 
 	var util, _;
 
-	_ = __webpack_require__(9);
+	_ = __webpack_require__(11);
 
 	module.exports = util = {};
 
 	_.extend(util, {
-	  inflections: __webpack_require__(28),
-	  string: __webpack_require__(29)
+	  inflections: __webpack_require__(32),
+	  string: __webpack_require__(33)
 	});
 
 	util.chunk = function(data, size) {
@@ -137,18 +140,29 @@ return /******/ (function(modules) { // webpackBootstrap
 	  }
 	};
 
+	util.wordsForNumber = function(number) {
+	  if (number === 0) {
+	    number = 0;
+	  }
+	  if (number > 1) {
+	    number = number - 1;
+	  }
+	  return ["one", "two", "three", "four", "five", "six", "seven", "eight", "nine", "ten", "eleven", "twelve", "thirteen", "fourteen", "fifteen", "sixteen", "seventeen"][number];
+	};
+
 
 /***/ },
-/* 3 */
+
+/***/ 3:
 /***/ function(module, exports, __webpack_require__) {
 
 	var Backbone, Model, util, _;
 
-	_ = __webpack_require__(9);
+	_ = __webpack_require__(11);
 
 	util = __webpack_require__(2);
 
-	Backbone = __webpack_require__(12);
+	Backbone = __webpack_require__(13);
 
 	module.exports = Model = Backbone.Model.extend({
 	  read: function(attr) {
@@ -162,16 +176,17 @@ return /******/ (function(modules) { // webpackBootstrap
 
 
 /***/ },
-/* 4 */
+
+/***/ 4:
 /***/ function(module, exports, __webpack_require__) {
 
 	var Backbone, Collection, util, _;
 
-	_ = __webpack_require__(9);
+	_ = __webpack_require__(11);
 
 	util = __webpack_require__(2);
 
-	Backbone = __webpack_require__(12);
+	Backbone = __webpack_require__(13);
 
 	module.exports = Collection = Backbone.Collection.extend({
 	  initialize: function(models, options) {
@@ -194,14 +209,15 @@ return /******/ (function(modules) { // webpackBootstrap
 
 
 /***/ },
-/* 5 */
+
+/***/ 5:
 /***/ function(module, exports, __webpack_require__) {
 
 	var Collection, CollectionDslAdapter, Model, ModelDslAdapter, Resource, ResourceDefinition, definitions, util, _, _resources,
 	  __hasProp = {}.hasOwnProperty,
 	  __extends = function(child, parent) { for (var key in parent) { if (__hasProp.call(parent, key)) child[key] = parent[key]; } function ctor() { this.constructor = child; } ctor.prototype = parent.prototype; child.prototype = new ctor(); child.__super__ = parent.prototype; return child; };
 
-	_ = __webpack_require__(9);
+	_ = __webpack_require__(11);
 
 	util = __webpack_require__(2);
 
@@ -300,7 +316,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	    if (result) {
 	      return result;
 	    }
-	    if (result = this.registry(util.string.underscored(resourceName))) {
+	    if (result = this.registry(util.string.underscored(resourceName), guess)) {
 	      return result;
 	    }
 	    if (!guess) {
@@ -396,10 +412,8 @@ return /******/ (function(modules) { // webpackBootstrap
 
 
 /***/ },
-/* 6 */,
-/* 7 */,
-/* 8 */,
-/* 9 */
+
+/***/ 11:
 /***/ function(module, exports, __webpack_require__) {
 
 	var __WEBPACK_AMD_DEFINE_ARRAY__, __WEBPACK_AMD_DEFINE_RESULT__;//     Underscore.js 1.7.0
@@ -1820,9 +1834,8 @@ return /******/ (function(modules) { // webpackBootstrap
 
 
 /***/ },
-/* 10 */,
-/* 11 */,
-/* 12 */
+
+/***/ 13:
 /***/ function(module, exports, __webpack_require__) {
 
 	var __WEBPACK_AMD_DEFINE_ARRAY__, __WEBPACK_AMD_DEFINE_RESULT__;//     Backbone.js 1.1.2
@@ -1836,7 +1849,7 @@ return /******/ (function(modules) { // webpackBootstrap
 
 	  // Set up Backbone appropriately for the environment. Start with AMD.
 	  if (true) {
-	    !(__WEBPACK_AMD_DEFINE_ARRAY__ = [__webpack_require__(9), __webpack_require__(1), exports], __WEBPACK_AMD_DEFINE_RESULT__ = function(_, $, exports) {
+	    !(__WEBPACK_AMD_DEFINE_ARRAY__ = [__webpack_require__(11), __webpack_require__(1), exports], __WEBPACK_AMD_DEFINE_RESULT__ = function(_, $, exports) {
 	      // Export global even in AMD case in case this script is loaded with
 	      // others that may still expect a global Backbone.
 	      root.Backbone = factory(root, exports, _, $);
@@ -3436,22 +3449,8 @@ return /******/ (function(modules) { // webpackBootstrap
 
 
 /***/ },
-/* 13 */,
-/* 14 */,
-/* 15 */,
-/* 16 */,
-/* 17 */,
-/* 18 */,
-/* 19 */,
-/* 20 */,
-/* 21 */,
-/* 22 */,
-/* 23 */,
-/* 24 */,
-/* 25 */,
-/* 26 */,
-/* 27 */,
-/* 28 */
+
+/***/ 32:
 /***/ function(module, exports, __webpack_require__) {
 
 	var __WEBPACK_AMD_DEFINE_FACTORY__, __WEBPACK_AMD_DEFINE_ARRAY__, __WEBPACK_AMD_DEFINE_RESULT__;/*!
@@ -4457,7 +4456,8 @@ return /******/ (function(modules) { // webpackBootstrap
 
 
 /***/ },
-/* 29 */
+
+/***/ 33:
 /***/ function(module, exports, __webpack_require__) {
 
 	var __WEBPACK_AMD_DEFINE_ARRAY__, __WEBPACK_AMD_DEFINE_RESULT__;//  Underscore.string
@@ -5136,5 +5136,6 @@ return /******/ (function(modules) { // webpackBootstrap
 
 
 /***/ }
-/******/ ])
+
+/******/ })
 });

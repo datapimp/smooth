@@ -11,9 +11,12 @@ Link          = Router.Link
 Locations     = Router.Locations
 Location      = Router.Location
 
-Sidebar           = require("./inspector/views/sidebar")
-IndexPage         = require("./inspector/pages/index")
-ApisIndexPage     = require("./inspector/pages/apis")
+Sidebar                 = require("./inspector/views/sidebar")
+IndexPage               = require("./inspector/pages/index")
+ResourcesIndexPage      = require("./inspector/pages/resources")
+
+InterfaceCollection     = require("./inspector/models/interface_collection")
+
 
 Application = React.createClass
   onBeforeNavigation: ->
@@ -21,6 +24,11 @@ Application = React.createClass
 
   onNavigation: ->
     console.log("App on Navigation")
+  
+  getInterface: ->
+    return @_interface if @_interface
+    @_interface = new InterfaceCollection()
+    @_interface
 
   render: ->
     <div className="wrapper">
@@ -28,12 +36,14 @@ Application = React.createClass
       <div className="ui page grid">
         <div className="column">
           <Locations onBeforeNavigation={@onBeforeNavigation} onNavigation={@onNavigation}>
-            <Location path="/smooth-developer-tools" handler={IndexPage} />
-            <Location path="/smooth-developer-tools/apis" handler={ApisIndexPage} />
+            <Location path="/smooth-developer-tools" handler={IndexPage} collection={@getInterface()}/>
+            <Location path="/smooth-developer-tools" handler={IndexPage} collection={@getInterface()}/>
+            <Location path="/smooth-developer-tools/resources" handler={ResourcesIndexPage} />
           </Locations>
         </div>
       </div>
     </div>
 
 $ ->
-  React.renderComponent(Application(), document.getElementById('application'))
+  prefix = if window.location.port == "4000" then "" else "/smooth-developer-tools"
+  React.renderComponent(Application(prefix: prefix), document.getElementById('application'))

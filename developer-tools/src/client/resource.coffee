@@ -55,7 +55,7 @@ _.extend Resource,
     result = if resourceName then _resources[resourceName] else _resources
     return result if result
 
-    if result = @registry(util.string.underscored(resourceName))
+    if result = @registry(util.string.underscored(resourceName), guess)
       return result
 
     @registry("#{util.string.underscored(resourceName)}".toLowerCase(), true) unless guess

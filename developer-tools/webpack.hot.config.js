@@ -7,17 +7,24 @@ var webpack = require("webpack");
 module.exports = {
   context: __dirname,
 
+  node: {
+      fs: "empty",
+      child_process:"empty",
+      net: "empty",
+      hiredis: "empty",
+      msgpack: "empty"
+  },
+
   entry: {
+    dev: "webpack-dev-server/client?http://localhost:4000",
+    hot_dev: "webpack/hot/dev-server",
     client: "./src/client.coffee",
     inspector: "./src/inspector.cjsx"
   },
 
   output: {
-    path: __dirname + "/dist",
-    filename: "[name].js",
-    library: ["Smooth","[name]"],
-    libraryTarget: "umd",
-    publicPath: "/smooth-developer-tools/"
+    filename: "express-bundle.js",
+    path: __dirname + "/dist"
   },
 
   resolve: {
@@ -29,10 +36,12 @@ module.exports = {
   },
 
   plugins: [
+    new webpack.HotModuleReplacementPlugin(),
     new webpack.ProvidePlugin({
       "_": "underscore",
       "Backbone": "backbone",
-      "React": "react"
+      "React": "react",
+      "Backbone.React.Component": "backbone-react-component"
     }) 
   ],
 
@@ -46,7 +55,7 @@ module.exports = {
   module: {
     loaders: [
       { test: /\.coffee$/, loaders: ["coffee-loader"] },
-      { test: /\.cjsx$/, loaders: ["coffee-loader","cjsx-loader"] },
+      { test: /\.cjsx$/, loaders: ["react-hot","coffee-loader","cjsx-loader"] },
       { test: /\.scss$/, loader: "style!css!sass?outputStyle=expanded"},
       { test: /\.css$/, loader: "style!css!sass?outputStyle=expanded"},
       {test: /\.(jpg|png|gif|svg)/, loader: 'file-loader?path=smooth-developer-tools'},

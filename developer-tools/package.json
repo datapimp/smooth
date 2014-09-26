@@ -31,7 +31,9 @@
     "backbone-react-component": "latest",
     "react-treeview": "latest",
     "react-draggable": "latest",
-    "react-router-component": "latest"
+    "react-router-component": "latest",
+    "react-hot-loader": "latest",
+    "react-tools": "latest"
   }
 }
 
