@@ -14,6 +14,20 @@ module Smooth
         @rules = []
       end
 
+      # I may be getting this in a convoluted way
+      # may be easier to build up naturally
+      def interface_documentation
+        descriptions.keys.inject({}) do |memo, verb|
+          routes = descriptions[verb]
+          routes.each do |_|
+            pattern, description = _
+            memo["#{ verb.to_s.upcase } #{ pattern }"] = description
+          end
+
+          memo
+        end
+      end
+
       def route_table
         @route_table ||= route_patterns_table.inject({}) do |memo, p|
           route_name, details = p

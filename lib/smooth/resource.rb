@@ -49,7 +49,11 @@ module Smooth
       resource = self
 
       @interface ||= begin
-                       resource.object_descriptions.keys.inject({}) do |memo, type|
+                       base = {
+                         routes: (router.interface_documentation() rescue {})
+                       }
+
+                       resource.object_descriptions.keys.inject(base) do |memo, type|
                          memo.tap do
                            bucket = memo[type] ||= {}
                            resource.send("available_#{ type }").each do |object_name|
@@ -73,8 +77,9 @@ module Smooth
       _serializers.keys
     end
 
+    # SHORT CIRCUIT
     def available_routes
-      _routes.keys
+      []
     end
 
     def available_examples
