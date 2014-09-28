@@ -20,7 +20,6 @@ describe "The Books Resource Routes" do
     response =client.get("/books?ids=#{ book_ids }")
     json = JSON.parse(response.body) rescue {}
 
-    binding.pry
     expect(json.length).to eq(2)
   end
 end
