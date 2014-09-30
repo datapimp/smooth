@@ -102,8 +102,8 @@ return /******/ (function(modules) { // webpackBootstrap
 	module.exports = util = {};
 
 	_.extend(util, {
-	  inflections: __webpack_require__(33),
-	  string: __webpack_require__(34)
+	  inflections: __webpack_require__(34),
+	  string: __webpack_require__(35)
 	});
 
 	util.chunk = function(data, size) {
@@ -265,7 +265,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	    if (options["private"] === true) {
 	      return this.newCollection(models, options);
 	    } else {
-	      return this.collection || (this.collection = this.newCollection(models, options));
+	      return this.singleton || (this.singleton = this.newCollection(models, options));
 	    }
 	  };
 
@@ -307,19 +307,18 @@ return /******/ (function(modules) { // webpackBootstrap
 	  reopen: function(resourceDefinition) {
 	    return definitions[resourceDefinition];
 	  },
-	  registry: function(resourceName, guess) {
+	  registry: function(resourceName, thisIsAGuess) {
 	    var result;
-	    if (guess == null) {
-	      guess = false;
+	    if (thisIsAGuess == null) {
+	      thisIsAGuess = false;
 	    }
-	    result = resourceName ? _resources[resourceName] : _resources;
-	    if (result) {
+	    if (result = _resources[resourceName]) {
 	      return result;
 	    }
-	    if (result = this.registry(util.string.underscored(resourceName), guess)) {
+	    if (result = this.registry(util.string.underscored(resourceName), isAGuess)) {
 	      return result;
 	    }
-	    if (!guess) {
+	    if (!thisIsAGuess) {
 	      return this.registry(("" + (util.string.underscored(resourceName))).toLowerCase(), true);
 	    }
 	  }
@@ -345,7 +344,11 @@ return /******/ (function(modules) { // webpackBootstrap
 	    return _.extend(this.definition, extensions);
 	  };
 
-	  ModelDslAdapter.prototype.belongsTo = function() {};
+	  ModelDslAdapter.prototype.belongsTo = function(relation, options) {
+	    if (options == null) {
+	      options = {};
+	    }
+	  };
 
 	  ModelDslAdapter.prototype.hasMany = function() {};
 
@@ -3450,7 +3453,7 @@ return /******/ (function(modules) { // webpackBootstrap
 
 /***/ },
 
-/***/ 33:
+/***/ 34:
 /***/ function(module, exports, __webpack_require__) {
 
 	var __WEBPACK_AMD_DEFINE_FACTORY__, __WEBPACK_AMD_DEFINE_ARRAY__, __WEBPACK_AMD_DEFINE_RESULT__;/*!
@@ -4457,7 +4460,7 @@ return /******/ (function(modules) { // webpackBootstrap
 
 /***/ },
 
-/***/ 34:
+/***/ 35:
 /***/ function(module, exports, __webpack_require__) {
 
 	var __WEBPACK_AMD_DEFINE_ARRAY__, __WEBPACK_AMD_DEFINE_RESULT__;//  Underscore.string

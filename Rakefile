@@ -31,6 +31,10 @@ namespace :build do
   task :webpack do
     root = Pathname(File.dirname(__FILE__))
     file = root.join("developer-tools","dist","client.js")
+    cwd = Dir.getwd()
+    Dir.chdir(cwd + '/developer-tools')
+    %x{webpack}
+    Dir.chdir(cwd)
     FileUtils.cp(file, root.join("app","assets","javascripts","smooth","index.js"))
   end
 end

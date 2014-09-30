@@ -27,7 +27,7 @@ module.exports = class Resource
     if options.private is true
       return @newCollection(models, options)
     else
-      @collection ||= @newCollection(models, options)
+      @singleton ||= @newCollection(models, options)
 
   newCollection:(models=[], options={})->
     new @definition.collectionClass(models, options)
@@ -51,14 +51,18 @@ _.extend Resource,
   reopen: (resourceDefinition)->
     definitions[resourceDefinition]
 
-  registry: (resourceName, guess=false)->
-    result = if resourceName then _resources[resourceName] else _resources
-    return result if result
-
-    if result = @registry(util.string.underscored(resourceName), guess)
+  registry: (resourceName, thisIsAGuess=false)->
+    # correct guess, first try. great champ.
+    if result = _resources[resourceName]
       return result
 
-    @registry("#{util.string.underscored(resourceName)}".toLowerCase(), true) unless guess
+    # try an underscored version of whatever was passed.
+    if result = @registry(util.string.underscored(resourceName), isAGuess)
+      return result
+
+    # Try one guess, maybe they should lowercase and underscore it
+    unless thisIsAGuess
+      @registry("#{util.string.underscored(resourceName)}".toLowerCase(), true)
 
 class ModelDslAdapter
   constructor: (definition={})->
@@ -77,9 +81,7 @@ class ModelDslAdapter
     # Build the meta table
     _.extend(@definition, extensions)
 
-  belongsTo: ->
-    # TODO
-    # Implement
+  belongsTo: (relation, options={})->
 
   hasMany: ->
     # TODO
