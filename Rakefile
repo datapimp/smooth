@@ -1,5 +1,6 @@
 require "bundler/gem_tasks"
 require 'pry'
+require 'pathname'
 
 #!/usr/bin/env rake
 begin
@@ -23,3 +24,13 @@ desc "Run all specs in spec directory (excluding plugin specs)"
 RSpec::Core::RakeTask.new(:spec => 'app:db:test:prepare')
 
 task :default => :spec
+
+namespace :build do
+  desc "Take the webpack assets and put them in the asset pipeline"
+
+  task :webpack do
+    root = Pathname(File.dirname(__FILE__))
+    file = root.join("developer-tools","dist","client.js")
+    FileUtils.cp(file, root.join("app","assets","javascripts","smooth","index.js"))
+  end
+end

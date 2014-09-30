@@ -88,7 +88,9 @@ module Smooth
       name = options.name
       name = nil if name == "Default"
 
-      klass = "#{ resource_name }#{ name }".singularize + "Query"
+      klass = "#{ resource.model_class }#{ name }".singularize + "Query"
+
+      klass = klass.gsub(/\s+/,'')
 
       apply_options = lambda do |k|
         k.model_class     ||= resource.model_class if resource.model_class
@@ -102,7 +104,11 @@ module Smooth
         return query_klass.tap(&apply_options)
       end
 
-      Object.const_set(klass, Class.new(base)).tap(&apply_options)
+      begin
+        Object.const_set(klass, Class.new(base)).tap(&apply_options)
+      rescue
+        binding.pry
+      end
     end
 
     def self.start_from *args, &block

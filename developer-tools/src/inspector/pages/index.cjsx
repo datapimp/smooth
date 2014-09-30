@@ -2,6 +2,7 @@ Link          = require('react-router-component').Link
 IconHeading   = require("../views/icon_heading")
 GridSort      = require("../views/grid_sort")
 ResourceCard  = require("../views/resource_card")
+Toolbar       = require("../views/toolbar")
 
 module.exports = IndexPage = React.createClass
   componentWillMount: ->
@@ -15,7 +16,16 @@ module.exports = IndexPage = React.createClass
     <ResourceCard key={resource.cid} resource={resource} />
 
   render: ->
-    <div className="">
+    <div className="page-container">
       <IconHeading title="Smooth API Documentation" />
-      <GridSort prepare={@prepareResourceCard} items={@props.collection.models} perRow=3 /> 
+      
+      <div className="ui vertical segment">
+        <div className="ui right floated basic segment">
+          <Toolbar resourceGroups={@props.collection.pluck('resource_group')}/>
+        </div>
+      </div>
+
+      <div className="grid-sort-wrapper" style={clear:"both"}>
+        <GridSort prepare={@prepareResourceCard} items={@props.collection.models} perRow=3 /> 
+      </div>
     </div>

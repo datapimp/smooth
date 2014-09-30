@@ -79,7 +79,9 @@ module Smooth
       name = options.name
       name = nil if name == "Default"
 
-      klass = "#{ resource_name }#{ name }".singularize + "Serializer"
+      klass = "#{ resource.model_class }#{ name }".singularize + "Serializer"
+
+      klass = klass.gsub(/\s+/,'')
 
       if serializer_klass = Object.const_get(klass) rescue nil
         return serializer_klass

@@ -7,7 +7,9 @@ module Smooth
 
     attr_accessor :resource_name,
                   :api_name,
-                  :model_class
+                  :model_class,
+                  :group_description,
+                  :description
 
     # These store the configuration values for the various
     # objects belonging to the resource.
@@ -45,6 +47,10 @@ module Smooth
       load!
     end
 
+    # The Smooth Resources are capable of exposing information
+    # about their configuration, which makes auto generating documentation
+    # for their API very easy, but this can also be used to generate
+    # client side models or control form / report builder interfaces.
     def interface_documentation
       resource = self
 
@@ -63,6 +69,12 @@ module Smooth
                          end
                        end
                      end.to_mash
+    end
+
+    # Resource groups allow for easier organization of the
+    # documentation and things of that nature.
+    def part_of_the group_description
+      @group_description = group_description
     end
 
     def available_commands
@@ -92,6 +104,22 @@ module Smooth
 
     def name
       resource_name
+    end
+
+    def has_many(*args)
+      model_class.send(:has_many, *args)
+    end
+
+    def belongs_to(*args)
+      model_class.send(:belongs_to, *args)
+    end
+
+    def has_one(*args)
+      model_class.send(:has_one, *args)
+    end
+
+    def has_and_belongs_to_many(*args)
+      model_class.send(:has_and_belongs_to_many, *args)
     end
 
     def fetch_config object_type, object_key

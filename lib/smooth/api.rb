@@ -161,22 +161,33 @@ module Smooth
       end
     end
 
-    def resource_names
+    def resource_keys
       _resources.keys
+    end
+
+    def resource_names
+      _resources.values.map(&:resource_name).compact
+    end
+
+    def resource_group_names
+      _resources.values.map(&:group_description).compact
     end
 
     def documentation_base
       {
         api_meta: {
-          resource_names: resource_names
+          resource_names: resource_names,
+          resource_groups: resource_group_names
         }
       }
     end
 
     def interface_documentation
-      resource_names.inject(documentation_base) do |memo, resource_name|
+      resource_keys.inject(documentation_base) do |memo, key|
         memo.tap do
-          memo[resource_name.to_s] = resource(resource_name).interface_documentation
+          if resource = resource(key)
+            memo[resource.resource_name || key.to_s] = resource.interface_documentation
+          end
         end
       end
     end

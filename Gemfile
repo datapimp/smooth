@@ -4,7 +4,5 @@ source 'https://rubygems.org'
 gemspec
 
 group :test, :development do
-  gem 'pry'
-  gem 'pry-nav'
   gem 'mutations', github: "datapimp/mutations", branch: "inline-documentation"
 end

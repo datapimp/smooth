@@ -123,7 +123,7 @@ class Smooth::Command < Mutations::Command
     base          = Smooth.command
 
     name = options.name.to_s.camelize
-    klass = "#{ name }#{ resource_name }"
+    klass = "#{ name }#{ resource.model_class }".gsub(/\s+/,'')
 
     apply_options = lambda do |k|
       k.model_class     ||= resource.model_class if resource.model_class
