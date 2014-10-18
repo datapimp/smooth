@@ -62,7 +62,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	$ = __webpack_require__(1);
 
 	Smooth = {
-	  version: '0.0.1',
+	  version: '0.0.2',
 	  config: {},
 	  Util: __webpack_require__(2),
 	  Model: __webpack_require__(3),
@@ -162,7 +162,7 @@ return /******/ (function(modules) { // webpackBootstrap
 
 	util = __webpack_require__(2);
 
-	Backbone = __webpack_require__(13);
+	Backbone = __webpack_require__(12);
 
 	module.exports = Model = Backbone.Model.extend({
 	  read: function(attr) {
@@ -186,7 +186,7 @@ return /******/ (function(modules) { // webpackBootstrap
 
 	util = __webpack_require__(2);
 
-	Backbone = __webpack_require__(13);
+	Backbone = __webpack_require__(12);
 
 	module.exports = Collection = Backbone.Collection.extend({
 	  initialize: function(models, options) {
@@ -253,6 +253,14 @@ return /******/ (function(modules) { // webpackBootstrap
 	      options = {};
 	    }
 	    return new this.getModelClass()(attributes, options);
+	  };
+
+	  Resource.prototype.fetch = function(options) {
+	    return this.getCollection(options).fetch(options);
+	  };
+
+	  Resource.prototype.find = function(id) {
+	    return this.getCollection().get(id);
 	  };
 
 	  Resource.prototype.getCollection = function(options) {
@@ -1838,7 +1846,7 @@ return /******/ (function(modules) { // webpackBootstrap
 
 /***/ },
 
-/***/ 13:
+/***/ 12:
 /***/ function(module, exports, __webpack_require__) {
 
 	var __WEBPACK_AMD_DEFINE_ARRAY__, __WEBPACK_AMD_DEFINE_RESULT__;//     Backbone.js 1.1.2

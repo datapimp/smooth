@@ -2,7 +2,7 @@ _ = require("underscore")
 $ = require("jquery")
 
 Smooth = {
-  version: '0.0.1',
+  version: '0.0.2',
   config: { },
 
   Util:       require("./util"),

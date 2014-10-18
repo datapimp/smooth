@@ -20,6 +20,12 @@ module.exports = class Resource
   newModel:(attributes={}, options={})->
     new @getModelClass()(attributes, options)
 
+  fetch: (options)->
+    @getCollection(options).fetch(options)
+
+  find: (id)->
+    @getCollection().get(id)
+
   getCollection: (options={})->
     models = options.models
     delete(options.models)
