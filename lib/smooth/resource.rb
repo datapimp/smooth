@@ -13,14 +13,14 @@ module Smooth
 
     # These store the configuration values for the various
     # objects belonging to the resource.
-    attr_reader  :_queries,
-                 :_commands,
-                 :_serializers,
-                 :_routes,
-                 :_examples,
-                 :object_descriptions
+    attr_reader :_queries,
+                :_commands,
+                :_serializers,
+                :_routes,
+                :_examples,
+                :object_descriptions
 
-    def initialize(resource_name, options={}, &block)
+    def initialize(resource_name, options = {}, &block)
       @resource_name  = resource_name
       @options        = options
 
@@ -56,10 +56,10 @@ module Smooth
 
       @interface ||= begin
                        base = {
-                         routes: (router.interface_documentation() rescue {})
+                         routes: (router.interface_documentation rescue {})
                        }
 
-                       resource.object_descriptions.keys.inject(base) do |memo, type|
+                       resource.object_descriptions.keys.reduce(base) do |memo, type|
                          memo.tap do
                            bucket = memo[type] ||= {}
                            resource.send("available_#{ type }").each do |object_name|
@@ -73,7 +73,7 @@ module Smooth
 
     # Resource groups allow for easier organization of the
     # documentation and things of that nature.
-    def part_of_the group_description
+    def part_of_the(group_description)
       @group_description = group_description
     end
 
@@ -122,13 +122,13 @@ module Smooth
       model_class.send(:has_and_belongs_to_many, *args)
     end
 
-    def fetch_config object_type, object_key
+    def fetch_config(object_type, object_key)
       source = send("_#{ object_type }s") rescue nil
       source = @_queries if object_type.to_sym == :query
       source && source.fetch(object_key.to_s.downcase.to_sym)
     end
 
-    def fetch object_type, object_key
+    def fetch(object_type, object_key)
       source = instance_variable_get("@#{ object_type }s") rescue nil
       source = @queries if object_type.to_sym == :query
       source && source.fetch(object_key.to_s.downcase)
@@ -150,39 +150,37 @@ module Smooth
       Smooth.fetch_api(api_name || :default)
     end
 
-    def apply_options *opts
+    def apply_options(*opts)
       @options.send(:merge!, *opts)
     end
 
-    def describe_object object_type, object_name, with_value={}
-      bucket = self.documentation_for(object_type, object_name)
+    def describe_object(object_type, object_name, with_value = {})
+      bucket = documentation_for(object_type, object_name)
 
-      with_value = {description: with_value} if with_value.is_a?(String)
+      with_value = { description: with_value } if with_value.is_a?(String)
 
-      bucket[:description] = with_value.fetch(:description, with_value["description"])
+      bucket[:description] = with_value.fetch(:description, with_value['description'])
       bucket[:description_args] = with_value.fetch(:args, [])
     end
 
-    def documentation_for object_type, object_name
-      self.object_descriptions[object_type.to_s.pluralize.to_sym][object_name.to_sym] ||= {}
+    def documentation_for(object_type, object_name)
+      object_descriptions[object_type.to_s.pluralize.to_sym][object_name.to_sym] ||= {}
     end
 
-    def expanded_documentation_for object_type, object_name
+    def expanded_documentation_for(object_type, object_name)
       base = documentation_for(object_type, object_name)
       klass = object_class_for(object_type, object_name)
 
       base.merge!(class: klass.to_s, interface: klass && klass.interface_documentation)
     end
 
-    def object_class_for object_type, object_name
-      begin
-        fetch(object_type.to_s.singularize.to_sym, object_name.to_sym)
-      rescue => e
-        binding.pry
-      end
+    def object_class_for(object_type, object_name)
+      fetch(object_type.to_s.singularize.to_sym, object_name.to_sym)
+    rescue => e
+      binding.pry
     end
 
-    def serializer serializer_name="Default", *args, &block
+    def serializer(serializer_name = 'Default', *args, &block)
       if args.empty? && !block_given? && exists = fetch(:serializer, serializer_name)
         return exists
       end
@@ -201,7 +199,7 @@ module Smooth
       config.description = provided_description unless provided_description.nil?
     end
 
-    def command command_name, *args, &block
+    def command(command_name, *args, &block)
       if args.empty? && !block_given? && exists = fetch(:command, command_name)
         return exists
       end
@@ -224,7 +222,7 @@ module Smooth
       config
     end
 
-    def query query_name="Default", *args, &block
+    def query(query_name = 'Default', *args, &block)
       if args.empty? && !block_given? && exists = fetch(:query, query_name)
         return exists
       end
@@ -246,12 +244,12 @@ module Smooth
       config
     end
 
-    def routes options={}, &block
+    def routes(options = {}, &block)
       return @router unless block_given?
 
       @router ||= Smooth::Resource::Router.new(self, options).tap do |router|
         router.instance_eval(&block)
-        router.build_methods_table()
+        router.build_methods_table
       end
     end
 
@@ -264,41 +262,41 @@ module Smooth
     end
 
     def router
-      @router || routes()
+      @router || routes
     end
 
     def route_table
       router.route_table
     end
 
-    def expand_routes(from_attributes={})
+    def expand_routes(from_attributes = {})
       router.expand_routes(from_attributes)
     end
 
-    def examples options={}, &block
+    def examples(options = {}, &_block)
       if options.empty? && !block_given?
         return @examples
       end
     end
 
-    def serializer_class reference=:default
+    def serializer_class(reference = :default)
       @serializers.fetch(reference, serializer_classes.first)
     end
 
-    def query_class reference=:default
+    def query_class(reference = :default)
       @queries.fetch(reference, query_classes.first)
     end
 
     def serializer_classes
-      @serializers && @serializers.values()
+      @serializers && @serializers.values
     end
 
     def query_classes
-      @queries && @queries.values()
+      @queries && @queries.values
     end
 
     def command_classes
-      @commands && @commands.values()
+      @commands && @commands.values
     end
 
     protected
@@ -306,7 +304,7 @@ module Smooth
     def configure_commands
       resource = self
 
-      @commands = _commands.inject({}.to_mash) do |memo, p|
+      @commands = _commands.reduce({}.to_mash) do |memo, p|
         ref, cfg = p
         memo[cfg.name.downcase] = Smooth::Command.configure(cfg, resource)
         memo
@@ -316,7 +314,7 @@ module Smooth
     def configure_serializers
       resource = self
 
-      @serializers = _serializers.inject({}.to_mash) do |memo, p|
+      @serializers = _serializers.reduce({}.to_mash) do |memo, p|
         memo.tap do
           ref, cfg = p
           serializer = memo[cfg.name.downcase] = Smooth::Serializer.configure(cfg, resource)
@@ -329,7 +327,7 @@ module Smooth
     def configure_queries
       resource = self
 
-      @queries = _queries.inject({}.to_mash) do |memo, p|
+      @queries = _queries.reduce({}.to_mash) do |memo, p|
         ref, cfg = p
         memo[cfg.name.downcase] = Smooth::Query.configure(cfg, resource)
         memo
@@ -343,7 +341,6 @@ module Smooth
     def configure_examples
       @examples = {}
     end
-
   end
 end
 

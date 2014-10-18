@@ -8,7 +8,7 @@ module Smooth
                   :options,
                   :system
 
-      def initialize(event_name, options={})
+      def initialize(event_name, options = {})
         @event_name = event_name
         @options    = options
         @system     = options.fetch(:system, Smooth::Event)
@@ -16,12 +16,12 @@ module Smooth
         enable
       end
 
-      def relay event, event_name=nil
+      def relay(_event, _event_name = nil)
         # IMPLEMENT IN YOUR OWN CLASS
-        raise NotImplementedError
+        fail NotImplementedError
       end
 
-      def process event, event_name=nil
+      def process(event, event_name = nil)
         [event, event_name]
       end
 
@@ -29,7 +29,7 @@ module Smooth
         @subscriber ||= system.subscribe_to(event_name, &method(:process_and_relay))
       end
 
-      def process_and_relay(event, event_name=nil)
+      def process_and_relay(event, event_name = nil)
         event, event_name = process(event, event_name)
         relay(event, event_name)
       end

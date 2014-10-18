@@ -1,6 +1,6 @@
 module Smooth
   class Example
-    def self.configure example_description, options, resource=nil
+    def self.configure(_example_description, _options, _resource = nil)
     end
   end
 end

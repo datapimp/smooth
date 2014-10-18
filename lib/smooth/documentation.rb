@@ -1,7 +1,6 @@
 module Smooth
   module Documentation
-
-    def self.included base
+    def self.included(base)
       base.class_eval do
         attr_accessor :_inline_description
 
@@ -13,7 +12,7 @@ module Smooth
       base.extend Smooth::Documentation
     end
 
-    def desc description, *args
+    def desc(description, *args)
       self._inline_description = {
         description: description,
         args: args
@@ -21,7 +20,7 @@ module Smooth
     end
 
     def inline_description
-      val = self._inline_description && self._inline_description.dup
+      val = _inline_description && _inline_description.dup
       self._inline_description = nil
       val
     end

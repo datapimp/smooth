@@ -29,7 +29,7 @@ module Smooth
         end
       end
 
-      def run_with_instrumentation event_prefix=nil
+      def run_with_instrumentation(event_prefix = nil)
         outcome = run_with_outcome
 
         event_prefix = "#{ event_prefix }." if event_prefix

@@ -3,15 +3,12 @@ module Smooth
     class Adapter
       class << self
         def configure
-
         end
 
         def in_use?
-          begin
-            connection.in_use?
-          rescue ActiveRecord::ConnectionNotEstablished
-            false
-          end
+          connection.in_use?
+        rescue ActiveRecord::ConnectionNotEstablished
+          false
         end
 
         def connection

@@ -15,7 +15,7 @@ class String
     length == 0
   end
 
-  def self.random_token length=12
+  def self.random_token(length = 12)
     rand(36**36).to_s(36).slice(0, length)
   end
 end

@@ -8,7 +8,7 @@ module Smooth
   class Cache
     include Singleton
 
-    def method_missing meth, *args, &block
+    def method_missing(meth, *args, &block)
       if defined? ::Rails
         return ::Rails.cache.send(meth, *args, &block)
       end

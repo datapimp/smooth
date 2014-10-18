@@ -5,7 +5,7 @@ module Smooth
         @@resources ||= {}
       end
 
-      def current_resource= resource_object
+      def current_resource=(resource_object)
         @current_resource = resource_object.identifier
       end
 

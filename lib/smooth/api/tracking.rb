@@ -5,7 +5,7 @@ module Smooth
         @@apis ||= {}
       end
 
-      def fetch_api name, &block
+      def fetch_api(name, &block)
         existing = apis[name.to_sym]
 
         if existing.nil? && block_given?
@@ -16,10 +16,10 @@ module Smooth
       end
 
       def current_api
-        apis[current_api_name] ||= Smooth::Api.default()
+        apis[current_api_name] ||= Smooth::Api.default
       end
 
-      def current_api_name= value
+      def current_api_name=(value)
         @@current_api_name = value
       end
 

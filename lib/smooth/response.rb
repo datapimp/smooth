@@ -4,7 +4,7 @@ module Smooth
 
     attr_accessor :request_headers, :serializer, :event_namespace, :command_action, :success, :object, :serializer_klass, :current_user
 
-    def initialize outcome, serializer_options={}
+    def initialize(outcome, serializer_options = {})
       @outcome = outcome
       @serializer_options = serializer_options
     end
@@ -15,7 +15,7 @@ module Smooth
 
     def headers
       {
-        "Content-Type" => "application/json"
+        'Content-Type' => 'application/json'
       }
     end
 
@@ -56,7 +56,7 @@ module Smooth
   end
 
   class ErrorResponse < Response
-    def initialize(error_message, request_object, *args)
+    def initialize(error_message, _request_object, *_args)
       @error_message = error_message
     end
 
@@ -70,6 +70,4 @@ module Smooth
       }
     end
   end
-
 end
-

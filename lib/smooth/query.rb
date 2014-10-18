@@ -20,7 +20,7 @@ module Smooth
         ids = raw_inputs['ids']
         ids = ids.split(',') if ids.is_a?(String)
 
-        self.scope = self.scope.where(id: Array(ids) )
+        self.scope = scope.where(id: Array(ids))
       end
     end
 
@@ -30,21 +30,21 @@ module Smooth
 
     protected
 
-    def operator_for filter
+    def operator_for(filter)
       specific = interface_for(filter).options.operator
       return specific if specific
       :eq
     end
 
-    def operator_and_type_for filter
-      [operator_for(filter),interface_for(filter).type]
+    def operator_and_type_for(filter)
+      [operator_for(filter), interface_for(filter).type]
     end
 
-    def column_for key
+    def column_for(key)
       interface_for(key).options.column || key
     end
 
-    def apply_filter *parts
+    def apply_filter(*parts)
       key, value = parts.flatten
 
       operator = operator_for(key)
@@ -58,7 +58,7 @@ module Smooth
       column = column_for(key)
       condition = arel_table[column].send(operator, value)
 
-      self.scope = self.scope.merge(self.scope.where(condition))
+      self.scope = scope.merge(scope.where(condition))
     end
 
     def arel_table
@@ -68,9 +68,9 @@ module Smooth
     class_attribute :query_config,
                     :parent_resource
 
-    self.query_config = Hashie::Mash.new(base:{})
+    self.query_config = Hashie::Mash.new(base: {})
 
-    def self.configure dsl_config_object, resource=nil
+    def self.configure(dsl_config_object, resource = nil)
       resource ||= Smooth.current_resource
       klass = define_or_open(dsl_config_object, resource)
 
@@ -86,17 +86,17 @@ module Smooth
       base          = Smooth.query
 
       name = options.name
-      name = nil if name == "Default"
+      name = nil if name == 'Default'
 
-      klass = "#{ resource.model_class }#{ name }".singularize + "Query"
+      klass = "#{ resource.model_class }#{ name }".singularize + 'Query'
 
-      klass = klass.gsub(/\s+/,'')
+      klass = klass.gsub(/\s+/, '')
 
       apply_options = lambda do |k|
         k.model_class     ||= resource.model_class if resource.model_class
 
         k.resource_name   = resource.name.to_s if k.resource_name.empty?
-        k.command_action  = "query" if k.command_action.empty?
+        k.command_action  = 'query' if k.command_action.empty?
         k.belongs_to_resource(resource)
       end
 
@@ -111,7 +111,7 @@ module Smooth
       end
     end
 
-    def self.start_from *args, &block
+    def self.start_from(*args, &_block)
       options = args.extract_options!
       config.start_from = options
     end
@@ -120,13 +120,13 @@ module Smooth
       inputs
     end
 
-    def self.params *args, &block
+    def self.params(*args, &block)
       options = args.extract_options!
       config.params = options
       send(:optional, *args, &block)
     end
 
-    def self.role name, &block
+    def self.role(name, &block)
       @current_config = name
       instance_eval(&block) if block_given?
     end
@@ -142,9 +142,8 @@ module Smooth
       val
     end
 
-    def self.respond_to_find_request request_object, options={}
+    def self.respond_to_find_request(request_object, _options = {})
       outcome = as(request_object.user).run(request_object.params)
-
 
       Smooth::Response.new(nil).tap do |response|
         response.command_action = :find
@@ -189,6 +188,5 @@ module Smooth
         end
       end
     end
-
   end
 end

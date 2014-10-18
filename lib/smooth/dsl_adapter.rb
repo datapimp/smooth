@@ -1,22 +1,22 @@
 module Smooth
   module DslAdapter
     # Creates or opens an API definition
-    def api name, *args, &block
+    def api(name, *args, &block)
       Smooth.current_api_name = name
 
       config_block = block_given?
 
-      instance = Smooth.fetch_api(name) do |key|
+      instance = Smooth.fetch_api(name) do |_key|
         options = args.dup.extract_options!
 
         Smooth::Api.new(name, options)
       end
 
-      instance.tap {|obj| obj.instance_eval(&block) if config_block }
+      instance.tap { |obj| obj.instance_eval(&block) if config_block }
     end
 
     # Creates or opens a resource definition
-    def resource name, *args, &block
+    def resource(name, *args, &block)
       options = args.extract_options!
 
       api = case

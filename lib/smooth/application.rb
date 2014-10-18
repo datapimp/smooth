@@ -5,7 +5,7 @@ module Smooth
     class User < Hashie::Mash
     end
 
-    def initialize(options={}, &block)
+    def initialize(options = {}, &block)
       @options = options
       instance_eval(&block) if block_given?
 
@@ -16,7 +16,7 @@ module Smooth
       boot unless options[:defer]
     end
 
-    def config &block
+    def config(&block)
       Smooth.config(&block)
     end
 
@@ -26,7 +26,7 @@ module Smooth
     end
 
     def system_user
-      @system_user ||= User.new(email: "system@smooth.io", role: "system")
+      @system_user ||= User.new(email: 'system@smooth.io', role: 'system')
     end
 
     def api
@@ -37,20 +37,20 @@ module Smooth
       @smooth ||= api.as(system_user)
     end
 
-    def resource *args, &block
+    def resource(*args, &_block)
       api.send(:resource, *args)
     end
 
-    def query *args
+    def query(*args)
       smooth.send(:query, *args)
     end
 
-    def command *args
+    def command(*args)
       smooth.send(:run_command, *args)
     end
 
     def load_models
-      Dir[config.models_path.join("**/*.rb")].each do |f|
+      Dir[config.models_path.join('**/*.rb')].each do |f|
         require config.models_path.join(f)
       end
     end
@@ -58,10 +58,9 @@ module Smooth
     def boot
       @boot ||= begin
                   Smooth.active_record.establish_connection
-                  load_models()
-                  Smooth.eager_load_from_app_folders()
+                  load_models
+                  Smooth.eager_load_from_app_folders
                 end
     end
-
   end
 end

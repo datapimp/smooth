@@ -1,10 +1,9 @@
 module Smooth
   class Resource
     module Templating
-
-      FakerGroups = %w{
+      FakerGroups = %w(
         Address Lorem Color Company Food HipterIpsum Internet Job Name Movie PhoneNumber Product Unit Vehicle Venue Skill
-      }
+      )
 
       def self.fakers
         FakerGroups.flat_map do |group|
@@ -12,12 +11,12 @@ module Smooth
           space = Faker.const_get(group.to_sym) rescue nil
 
           if space && space.class == Module
-            (space.methods - Object.methods - [:k, :underscore]).map {|m| "#{prefix}.#{m}"}
+            (space.methods - Object.methods - [:k, :underscore]).map { |m| "#{prefix}.#{m}" }
           end
         end.compact.uniq
       end
 
-      def create_from_template(name=nil, *args, &block)
+      def create_from_template(name = nil, *args, &block)
         if name.is_a?(Hash)
           args.unshift(name)
           name = @template_name
@@ -25,7 +24,7 @@ module Smooth
         FactoryGirl.create(name || @template_name, *args, &block)
       end
 
-      def build_from_template(name=nil, *args, &block)
+      def build_from_template(name = nil, *args, &block)
         if name.is_a?(Hash)
           args.unshift(name)
           name = @template_name
@@ -34,7 +33,7 @@ module Smooth
         FactoryGirl.build(name || @template_name, *args, &block)
       end
 
-      def template name=nil, *args, &block
+      def template(name = nil, *args, &block)
         options = args.extract_options!
 
         if name.nil?
@@ -49,16 +48,15 @@ module Smooth
         end
       end
 
-      def template_registered? name=nil
+      def template_registered?(name = nil)
         name ||= model_class.table_name.singularize.to_sym
         !!(FactoryGirl.factory_by_name(name) rescue nil)
       end
 
       # Just allows us to wrap template definitions
-      def templates &block
+      def templates(&block)
         instance_eval(&block)
       end
-
     end
   end
 end

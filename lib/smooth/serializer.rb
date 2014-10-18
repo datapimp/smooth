@@ -2,7 +2,6 @@ module Smooth
   class Serializer < ActiveModel::Serializer
     include Smooth::Documentation
 
-
     class_attribute :attribute_descriptions,
                     :relationship_descriptions,
                     :resource_route_variables
@@ -28,7 +27,7 @@ module Smooth
     def route_variables
       serializer = self
 
-      self.class.route_variables.inject({}) do |memo, var|
+      self.class.route_variables.reduce({}) do |memo, var|
         value = case
                 when serializer.respond_to?(var)
                   serializer.send(var)
@@ -44,10 +43,10 @@ module Smooth
     end
 
     def self.route_variables
-      @resource_route_variables ||= parent_resource.router.route_patterns_table.map {|p| _, h = p; h[:variables] }.flatten.compact.uniq
+      @resource_route_variables ||= parent_resource.router.route_patterns_table.map { |p| _, h = p; h[:variables] }.flatten.compact.uniq
     end
 
-    def self.method_added method_name
+    def self.method_added(method_name)
       if documented = inline_description
         attribute_descriptions[method_name.to_sym] = documented
       end
@@ -61,7 +60,7 @@ module Smooth
       schema[:associations]
     end
 
-    def self.configure options, resource=nil
+    def self.configure(options, resource = nil)
       resource ||= Smooth.current_resource
       klass = define_or_open(options, resource)
 
@@ -77,11 +76,11 @@ module Smooth
       base          = Smooth.serializer
 
       name = options.name
-      name = nil if name == "Default"
+      name = nil if name == 'Default'
 
-      klass = "#{ resource.model_class }#{ name }".singularize + "Serializer"
+      klass = "#{ resource.model_class }#{ name }".singularize + 'Serializer'
 
-      klass = klass.gsub(/\s+/,'')
+      klass = klass.gsub(/\s+/, '')
 
       if serializer_klass = Object.const_get(klass) rescue nil
         return serializer_klass
@@ -119,11 +118,11 @@ module Smooth
       parent_resource.api
     end
 
-    def self.documentation_for_attribute attribute
+    def self.documentation_for_attribute(attribute)
       attribute_descriptions[attribute.to_sym]
     end
 
-    def self.documentation_for_association association
+    def self.documentation_for_association(association)
       relationship_descriptions[association.to_sym]
     end
 
@@ -135,7 +134,7 @@ module Smooth
       documentation
     end
 
-    def self.attribute attr, options={}
+    def self.attribute(attr, options = {})
       documented = inline_description
 
       if documented
@@ -145,13 +144,13 @@ module Smooth
       super
     end
 
-    def self.computed *args, &block
+    def self.computed(*args, &block)
       property_name = args.first
       send(:define_method, property_name, &block)
       send(:attribute, *args)
     end
 
-    def self.has_one attr, options={}
+    def self.has_one(attr, options = {})
       documented = inline_description
 
       if documented
@@ -161,7 +160,7 @@ module Smooth
       super
     end
 
-    def self.has_many attr, options={}
+    def self.has_many(attr, options = {})
       documented = inline_description
 
       if documented
@@ -179,7 +178,6 @@ module Smooth
     def self.returns_ids_for_relationships?
       @returns_ids_for_relationships == true
     end
-
   end
 
   class ArraySerializer < ActiveModel::ArraySerializer

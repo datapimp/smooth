@@ -1,14 +1,13 @@
 module Smooth
   module UserAdapter
-
     def self.included(base)
       base.extend(ClassMethods)
-      base.send(:attr_accessor,:last_request_params, :last_request_headers)
+      base.send(:attr_accessor, :last_request_params, :last_request_headers)
 
-      base.send(:before_create, ->{ generate_token(Smooth.config.auth_token_column) })
+      base.send(:before_create, -> { generate_token(Smooth.config.auth_token_column) })
     end
 
-    def generate_token column
+    def generate_token(column)
       if self.class.column_names.include?(column.to_s)
         write_attribute(column, SecureRandom.urlsafe_base64)
       end
@@ -24,7 +23,7 @@ module Smooth
         find_for_smooth_api_request(id, token)
       end
 
-      def anonymous params=nil, headers=nil
+      def anonymous(params = nil, headers = nil)
         User.new.tap do |user|
           user.last_request_params = params if params
           user.last_request_headers = headers if headers
@@ -33,7 +32,7 @@ module Smooth
       end
     end
 
-    def making_anonymous_request= setting
+    def making_anonymous_request=(setting)
       @making_anonymous_request = !!(setting)
     end
 
@@ -43,7 +42,7 @@ module Smooth
 
     def smooth_authentication_token
       read_attribute(:authentication_token)
-      "#{ self.id }:#{ token }"
+      "#{ id }:#{ token }"
     end
 
     # Allows for using the current_user making an API request
@@ -77,7 +76,7 @@ module Smooth
     #     render :json => run_query("books", params)
     #   end
     # end
-    def smooth(api=:default)
+    def smooth(api = :default)
       Smooth.fetch_api(api).as(self)
     end
   end

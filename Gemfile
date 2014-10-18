@@ -5,4 +5,5 @@ gemspec
 
 group :test, :development do
   gem 'mutations', github: "datapimp/mutations", branch: "inline-documentation"
+  gem 'rubocop', require: false
 end

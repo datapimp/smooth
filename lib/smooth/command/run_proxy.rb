@@ -9,14 +9,13 @@ module Smooth
         @cmd = cmd
       end
 
-      def run! *args
-        cmd.new(*args).tap {|c| c.current_user = current_user }.run!
+      def run!(*args)
+        cmd.new(*args).tap { |c| c.current_user = current_user }.run!
       end
 
-      def run *args
-        cmd.new(*args).tap {|c| c.current_user = current_user }.run
+      def run(*args)
+        cmd.new(*args).tap { |c| c.current_user = current_user }.run
       end
     end
   end
 end
-

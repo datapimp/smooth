@@ -1,17 +1,17 @@
 class Smooth::Command < Mutations::Command
   include Instrumented
 
-  def self.as current_user
+  def self.as(current_user)
     require 'smooth/command/run_proxy' unless defined?(RunProxy)
     RunProxy.new(current_user, self)
   end
 
   # DSL Improvements English
-  def self.params *args, &block
+  def self.params(*args, &block)
     send(:required, *args, &block)
   end
 
-  def self.interface *args, &block
+  def self.interface(*args, &block)
     send(:required, *args, &block)
   end
 
@@ -54,26 +54,26 @@ class Smooth::Command < Mutations::Command
   # by that method.  It will pass whatever arguments you pass to scope
   # to the scope method.  if you pass no args, and the scope requires one,
   # we will assume the user wants us to pass the current user of the command
-  def scope *args
+  def scope(*args)
     @scope ||= begin
-                meth = model_class.send(:method, self.class.base_scope)
+                 meth = model_class.send(:method, self.class.base_scope)
 
-                if meth.arity.abs >= 1
-                  args.push(current_user) if args.empty?
-                  model_class.send(self.class.base_scope, *args)
-                else
-                  model_class.send(self.class.base_scope)
-                end
+                 if meth.arity.abs >= 1
+                   args.push(current_user) if args.empty?
+                   model_class.send(self.class.base_scope, *args)
+                 else
+                   model_class.send(self.class.base_scope)
+                 end
                end
   end
 
-  def scope= new_scope
+  def scope=(new_scope)
     @scope = new_scope || scope
   end
 
-  def self.scope setting=nil
-    self.base_scope= setting if setting
-    self.base_scope || :all
+  def self.scope(setting = nil)
+    self.base_scope = setting if setting
+    base_scope || :all
   end
 
   def self.event_namespace
@@ -95,19 +95,33 @@ class Smooth::Command < Mutations::Command
   end
 
   def self.object_path
-    resource_name.downcase + "." + command_action
+    resource_name.downcase + '.' + command_action
   end
 
-  def event_namespace; self.class.event_namespace; end
-  def object_path; self.class.object_path; end
-  def resource_name; self.class.resource_name; end
-  def resource_alias; self.class.resource_alias; end
-  def model_class; self.class.model_class; end
+  def event_namespace
+    self.class.event_namespace
+  end
+
+  def object_path
+    self.class.object_path
+  end
+
+  def resource_name
+    self.class.resource_name
+  end
+
+  def resource_alias
+    self.class.resource_alias
+  end
+
+  def model_class
+    self.class.model_class
+  end
 
   # DSL Hooks
   #
   #
-  def self.configure dsl_config_object, resource=nil
+  def self.configure(dsl_config_object, resource = nil)
     resource ||= Smooth.current_resource
     klass = define_or_open(dsl_config_object, resource)
 
@@ -123,7 +137,7 @@ class Smooth::Command < Mutations::Command
     base          = Smooth.command
 
     name = options.name.to_s.camelize
-    klass = "#{ name }#{ resource.model_class }".gsub(/\s+/,'')
+    klass = "#{ name }#{ resource.model_class }".gsub(/\s+/, '')
 
     apply_options = lambda do |k|
       k.model_class     ||= resource.model_class if resource.model_class
@@ -152,139 +166,139 @@ class Smooth::Command < Mutations::Command
 
   # Interface Documentation
   #
-    def interface_for filter
-      self.class.interface_description.filters.send(filter)
-    end
+  def interface_for(filter)
+    self.class.interface_description.filters.send(filter)
+  end
 
-    def self.interface_description
-      interface_documentation
-    end
+  def self.interface_description
+    interface_documentation
+  end
 
-    def self.interface_documentation
-      optional_inputs = input_filters.optional_inputs
-      required_inputs = input_filters.required_inputs
+  def self.interface_documentation
+    optional_inputs = input_filters.optional_inputs
+    required_inputs = input_filters.required_inputs
 
-      data = {
-        required: required_inputs.keys,
-        optional: optional_inputs.keys,
-        filters: {}
+    data = {
+      required: required_inputs.keys,
+      optional: optional_inputs.keys,
+      filters: {}
+    }
+
+    blk = lambda do |memo, parts, required|
+      key, filter = parts
+
+      type        = filter.class.name[/^Mutations::([a-zA-Z]*)Filter$/, 1].underscore
+      options     = filter.options.merge(required: required)
+
+      value = memo[key] = {
+        type: type,
+        options: options.reject { |_k, v| v.nil? },
+        description: input_descriptions[key]
       }
 
-      blk = lambda do |memo, parts, required|
-        key, filter = parts
-
-        type        = filter.class.name[/^Mutations::([a-zA-Z]*)Filter$/, 1].underscore
-        options     = filter.options.merge(required: required)
-
-        value = memo[key] = {
-          type: type,
-          options: options.reject {|k,v| v.nil? },
-          description: input_descriptions[key]
-        }
-
-        if options[:faker]
-          value[:example] = Smooth.faker(options[:faker])
-        end
-
-        memo
+      if options[:faker]
+        value[:example] = Smooth.faker(options[:faker])
       end
 
-      required_inputs.reduce(data[:filters]) do |memo, parts|
-        blk.call(memo, parts, true)
-      end
-
-      optional_inputs.reduce(data[:filters]) do |memo, parts|
-        blk.call(memo, parts, false)
-      end
-
-      data.to_mash
+      memo
     end
 
-    def self.filter_for_param(param)
-      optional_inputs[param] || required_inputs[param]
+    required_inputs.reduce(data[:filters]) do |memo, parts|
+      blk.call(memo, parts, true)
     end
 
-    def self.filter_options_for_param(param)
-      filter_for_param(param).try(:options)
+    optional_inputs.reduce(data[:filters]) do |memo, parts|
+      blk.call(memo, parts, false)
     end
 
-    def self.response_class
-      Smooth::Response
+    data.to_mash
+  end
+
+  def self.filter_for_param(param)
+    optional_inputs[param] || required_inputs[param]
+  end
+
+  def self.filter_options_for_param(param)
+    filter_for_param(param).try(:options)
+  end
+
+  def self.response_class
+    Smooth::Response
+  end
+
+  # Creates a new instance of the Smooth::Command::Response
+  # class in response to a request from the Router.  It is
+  # assumed that a request object responds to: user, and params
+  def self.respond_to_request(request_object, options = {})
+    klass = self
+
+    outcome = options.fetch(:outcome) do
+      klass.as(request_object.user).run(request_object.params)
     end
 
-    # Creates a new instance of the Smooth::Command::Response
-    # class in response to a request from the Router.  It is
-    # assumed that a request object responds to: user, and params
-    def self.respond_to_request(request_object, options={})
-      klass = self
-
-      outcome = options.fetch(:outcome) do
-        klass.as(request_object.user).run(request_object.params)
-      end
-
-      response_class.new(outcome, serializer_options).tap do |response|
-        response.request_headers = request_object.headers
-        response.serializer = find_serializer_for(request_object)
-        response.event_namespace = event_namespace
-        response.command_action = command_action
-        response.current_user = request_object.user
-      end
+    response_class.new(outcome, serializer_options).tap do |response|
+      response.request_headers = request_object.headers
+      response.serializer = find_serializer_for(request_object)
+      response.event_namespace = event_namespace
+      response.command_action = command_action
+      response.current_user = request_object.user
     end
+  end
 
-    def self.find_serializer_for(request_object)
-      resource = Smooth.resource(resource_name)
-      resource ||= Smooth.resource("#{ resource_name }".pluralize)
+  def self.find_serializer_for(_request_object)
+    resource = Smooth.resource(resource_name)
+    resource ||= Smooth.resource("#{ resource_name }".pluralize)
 
-      # TODO
-      # We can make the preferred format something you can
-      # specify via a header or parameter.  We can also restrict
-      # certain serializers from certain policies.
-      preferred_format = :default
+    # TODO
+    # We can make the preferred format something you can
+    # specify via a header or parameter.  We can also restrict
+    # certain serializers from certain policies.
+    preferred_format = :default
 
-      resource.fetch(:serializer, preferred_format)
+    resource.fetch(:serializer, preferred_format)
+  end
+
+  def self.serializer_options
+    {}
+  end
+
+  # Allows for defining common execution pattern methods
+  # mostly for standard CRUD against scoped models
+  def self.execute(execution_pattern = nil, &block)
+    send :define_method, :execute, (block || get_execution_pattern(execution_pattern))
+  end
+
+  Patterns = {}
+
+  Patterns[:update] = lambda do
+    scoped_find_object.update_attributes(inputs)
+    scoped_find_object
+  end
+
+  Patterns[:create] = lambda do
+    scope.create(inputs)
+  end
+
+  Patterns[:destroy] = lambda do
+    scoped_find_object.destroy
+    scoped_find_object
+  end
+
+  def scoped_find_object
+    @scoped_find ||= if scope.respond_to?(:find) && found = (scope.find(id) rescue nil)
+                       found
+    else
+      add_error(:id, :not_found, "could not find a #{ resource_name } model with that id")
     end
+  end
 
-    def self.serializer_options
-      {}
+  def self.get_execution_pattern(pattern_name)
+    if respond_to?("#{ pattern_name }_execution_pattern")
+      return method("#{ pattern_name }_execution_pattern").to_proc
+    elsif Patterns.key?(pattern_name.to_sym)
+      Patterns.fetch(pattern_name.to_sym)
+    else
+      return method(:execute).to_proc
     end
-
-    # Allows for defining common execution pattern methods
-    # mostly for standard CRUD against scoped models
-    def self.execute(execution_pattern=nil, &block)
-      send :define_method, :execute, (block || get_execution_pattern(execution_pattern))
-    end
-
-    Patterns = {}
-
-    Patterns[:update] = lambda do
-      scoped_find_object.update_attributes(inputs)
-      scoped_find_object
-    end
-
-    Patterns[:create] = lambda do
-      scope.create(inputs)
-    end
-
-    Patterns[:destroy] = lambda do
-      scoped_find_object.destroy
-      scoped_find_object
-    end
-
-    def scoped_find_object
-      @scoped_find ||= if scope.respond_to?(:find) && found = (scope.find(id) rescue nil)
-        found
-      else
-        add_error(:id, :not_found, "could not find a #{ resource_name } model with that id")
-      end
-    end
-
-    def self.get_execution_pattern(pattern_name)
-      if respond_to?("#{ pattern_name }_execution_pattern")
-        return method("#{ pattern_name }_execution_pattern").to_proc
-      elsif Patterns.has_key?(pattern_name.to_sym)
-        Patterns.fetch(pattern_name.to_sym)
-      else
-        return method(:execute).to_proc
-      end
-    end
+  end
 end

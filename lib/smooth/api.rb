@@ -10,7 +10,6 @@
 # that speak JSON since the interface pretty well encapsulates the behavior.
 module Smooth
   class Api
-
     # Being able to inspect an API and produce data suitable for generating interface
     # documentation, and automated tests, among other things, is a key feature of the gem.
     include Smooth::Documentation
@@ -24,7 +23,7 @@ module Smooth
                   :_resources,
                   :_policies
 
-    def initialize(name, options={})
+    def initialize(name, options = {})
       @name       = name.to_s
       @options    = options
 
@@ -34,7 +33,7 @@ module Smooth
 
     # The Smooth API is a gateway for the commands and queries
     # that can be run by users against its resources
-    def lookup path
+    def lookup(path)
       lookup_object_by(path)
     end
 
@@ -69,7 +68,7 @@ module Smooth
       app = @sinatra_application_klass ||= Class.new(Sinatra::Base)
 
       @sinatra ||=  begin
-                      _resources.each do |name, resource|
+                      _resources.each do |_name, resource|
                         resource.router && resource.router.apply_to(app)
                       end
 
@@ -86,7 +85,7 @@ module Smooth
     # The API will rely on the configured authentication method
     # to determine who the user is.  Given some request params
     # and request headers
-    def lookup_current_user params, headers
+    def lookup_current_user(params, headers)
       auth_strategy, key = authentication_strategy
 
       case
@@ -102,7 +101,7 @@ module Smooth
     # The Policy will provide an ability file that we can
     # run a user though. The Policy can be overridden by the
     # resource, too.  A policy will pass an object path
-    def lookup_policy params, headers
+    def lookup_policy(_params, _headers)
       {}.to_mash
       # TODO
       #
@@ -116,7 +115,7 @@ module Smooth
     end
 
     # The Smooth API provides an Asynchronous interface.
-    def perform_async(object_path, payload={})
+    def perform_async(object_path, payload = {})
       worker.perform_async serialize_for_async(object_path, payload)
     end
 
@@ -145,14 +144,14 @@ module Smooth
     # Example:
     #
     # lookup('books.create') #=> CreateBook
-    def lookup_object_by path
+    def lookup_object_by(path)
       path = path.to_s
       resource_name, object_name = path.split(Smooth.config.object_path_separator)
 
       resource_object = resource(resource_name)
 
       case
-      when object_name == "query" || object_name == "serializer"
+      when object_name == 'query' || object_name == 'serializer'
         resource_object.fetch(object_name.to_sym, :default)
       when object_name.nil?
         resource_object
@@ -183,7 +182,7 @@ module Smooth
     end
 
     def interface_documentation
-      resource_keys.inject(documentation_base) do |memo, key|
+      resource_keys.reduce(documentation_base) do |memo, key|
         memo.tap do
           if resource = resource(key)
             memo[resource.resource_name || key.to_s] = resource.interface_documentation
@@ -195,47 +194,47 @@ module Smooth
     def expose_interface_documentation_via(sinatra)
       api = self
 
-      sinatra.send :get, "/interface" do
+      sinatra.send :get, '/interface' do
         api.interface_documentation.to_json
       end
 
-      sinatra.send :get, "/interface/:resource_name" do
+      sinatra.send :get, '/interface/:resource_name' do
         docs = api.interface_documentation[params[:resource_name]]
         docs.to_json
       end
     end
 
-    def version config=nil
+    def version(config = nil)
       @_version_config = config if config
       @_version_config
     end
 
-    def user_class user_klass=nil, &block
+    def user_class(user_klass = nil, &block)
       @user_class = user_klass if user_klass.present?
       @user_class || User
       @user_class.class_eval(&block) if block_given?
       @user_class
     end
 
-    def authentication_strategy option=nil, key=nil
-      return @authentication_strategy || [:header, "X-AUTH-TOKEN"] if option.nil?
+    def authentication_strategy(option = nil, key = nil)
+      return @authentication_strategy || [:header, 'X-AUTH-TOKEN'] if option.nil?
 
-      if !option.nil?
+      unless option.nil?
         key = case
               when key.present?
                 key
               when option.to_sym == :param
                 :auth_token
               when option.to_sym == :header
-                "X-AUTH-TOKEN"
+                'X-AUTH-TOKEN'
               end
       end
 
       @authentication_strategy = [option, key]
     end
 
-    def worker &block
-      worker_name = "#{ name }".camelize + "Worker"
+    def worker(&block)
+      worker_name = "#{ name }".camelize + 'Worker'
 
       if worker_klass = Smooth::Api.const_get(worker_name) rescue nil
         @worker_klass = worker_klass
@@ -248,7 +247,7 @@ module Smooth
       @worker_klass
     end
 
-    def policy policy_name, options={}, &block
+    def policy(policy_name, options = {}, &block)
       if obj = _policies[policy_name.to_sym]
         obj.apply_options(options) unless options.empty?
         obj.instance_eval(&block) if block_given?
@@ -263,12 +262,12 @@ module Smooth
       end
     end
 
-    def has_resource? resource_name
-      resources.has_key?(resource_name.to_sym)
+    def has_resource?(resource_name)
+      resources.key?(resource_name.to_sym)
     end
 
-    def resource resource_name, options={}, &block
-      api_name = self.name
+    def resource(resource_name, options = {}, &block)
+      api_name = name
 
       existing = _resources[resource_name.to_s.downcase]
 
@@ -287,7 +286,6 @@ module Smooth
         _resources[resource_name.to_s.downcase] = created
       end
     end
-
   end
 
   class DslProxy
@@ -308,14 +306,14 @@ module Smooth
       self
     end
 
-    def query resource_name, *args
+    def query(resource_name, *args)
       params = args.extract_options!
       query_name = args.first || :default
       runner = @api.resource(resource_name).fetch(:query, query_name).as(@current_user)
       runner.async? ? perform_async(runner.object_path, params) : runner.run(params)
     end
 
-    def run_command resource_name, *args
+    def run_command(resource_name, *args)
       params = args.extract_options!
       command_name = args.first
       path = resource_name if command_name.nil?
@@ -324,7 +322,5 @@ module Smooth
       runner = @api.lookup_object_by(path).as(@current_user)
       runner.async? ? perform_async(runner.object_path, params) : runner.run(params)
     end
-
   end
 end
-

@@ -5,12 +5,12 @@ module Smooth
 
       attr_accessor :name
 
-      def initialize name, options={}
+      def initialize(name, options = {})
         @name = name
         @options = options
       end
 
-      def apply_options *opts
+      def apply_options(*opts)
         @options.send(:merge!, *opts)
       end
     end
