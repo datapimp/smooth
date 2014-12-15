@@ -54,7 +54,7 @@ page on their website.
 - What type of data, what values?
 - Should a user only be allowed to see a hard coded subset of records? 
 
-##### Presenters:
+##### Serializers:
 
 Given a query which returns a set of zero or more records, we will often
 want to present this data in an optimized format.  We'll want to convert 
@@ -66,7 +66,7 @@ In smooth we enumerate:
 - In what ways would an API client want to see this data? 
 - As individual objects? As a reduced / aggregated report?
 - In what ways does the data change depending on who is looking at it?
-- Are there different presenters for different roles?
+- Are there different serializers for different roles?
 - What are each of the attributes and what do they mean?
 
 ## Coding the smooth way 
@@ -105,9 +105,9 @@ There are a few distinctly different ways of working with code *sunglasses* smoo
     - update_book.rb
   - queries
     - book_query.rb
-  - presenters
-    - book_presenter.rb
-    - book_summary_presenter.rb
+  - serializers
+    - book_serializer.rb
+    - book_summary_serializer.rb
 ```
 
 #### Queries
@@ -145,7 +145,7 @@ BookQuery.interface
 ```
 
 ### TODO: Command Example 
-### TODO: Presenter Example
+### TODO: Serializers Example
 ### TODO: Router Example
 ### TODO: Backbone + Ember Data Model Generator
 ### TODO: Interactive API Documentation Generator
