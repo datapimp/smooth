@@ -38,6 +38,31 @@ to their cookbook. A moderator removing a rude comment on their blog.
 We define the set of commands available and what information they
 require:
 
+```ruby
+resource "Books" do
+  desc "Update a book's attributes"
+  command :update do
+    # Will ensure the command is run with
+    # Book.accessible_to(current_user).find(id).
+    scope :accessible_to
+
+    params do
+      duck :id, :method => :to_s
+
+      optional do
+        desc "the title of the book"
+        string :title
+      end
+    end
+
+    execute(:update)
+  end
+end
+```
+
+The DSL for commands allows us to document and code the
+interface to define:
+
 - In what ways can a user change the data?
 - What specific parameters must an API client pass to these commands?
 - Describe what they mean for a developer?
@@ -48,6 +73,28 @@ require:
 API clients often have large sets of data that they need to reduce to a  
 manageable size to render in some view in their application or dynamic
 page on their website.
+
+```ruby
+  query do
+    # calls `Book.accessible_to(current_user)`
+    scope :accessible_to
+
+    params do
+      desc "The year the book was published (example: YYYY)"
+      integer :year_published, operator: :gte
+
+      desc "A partial string to filter the title by"
+      string :title, operator: :like
+    end
+
+    role :admin do
+      scope :all
+    end
+  end
+
+```
+
+The Query DSL lets us document and decide:
 
 - In what ways can a user or role filter the data? 
 - Specifically what parameters would an API client pass? 
@@ -61,7 +108,31 @@ want to present this data in an optimized format.  We'll want to convert
 a specific timestamp into a description of the amount of time that has
 passed.  We'll want to display individual things in a table, or maybe as a pie chart. 
 
-In smooth we enumerate:
+```ruby
+  desc "The default serializer for book"
+  serializer do
+    desc "A unique id for the book", :type => :integer
+    attribute :id
+
+    desc "The title of the book", :type => :string
+    attribute :title
+
+    desc "The author of the book"
+    has_one :author
+
+    desc "Documentation for computed property"
+    def computed_property
+      object.created_at
+    end
+
+    desc "Another way for doing computed properties"
+    computed(:another_computed_property) do
+      object.created_at.to_i
+    end
+  end
+```
+
+In smooth's serializer DSL we document and decide:
 
 - In what ways would an API client want to see this data? 
 - As individual objects? As a reduced / aggregated report?
@@ -71,7 +142,7 @@ In smooth we enumerate:
 
 ## Coding the smooth way 
 
-There are a few distinctly different ways of working with code *sunglasses* smoothly.
+Using the Smooth API toolkit is possible:
 
 - Use it in your rails application, edit the different classes of ruby
   objects whose file names, locations, and class names follow a familiar
